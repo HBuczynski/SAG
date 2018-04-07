@@ -11,7 +11,7 @@ import jade.lang.acl.MessageTemplate;
 public class MazeDrawingAgent extends Agent {
     private DFAgentDescription[] result;
     private ACLMessage receivedMessage;
-    private int[][] maze;
+    private PossibleValues[][] maze;
 
 
     public void setup() {
@@ -60,18 +60,18 @@ public class MazeDrawingAgent extends Agent {
     protected void takeDown() {
     }
 
-    private int[][] getMazeFromString(String mazeString) {
-        int[][] mazeInt;
+    private PossibleValues[][] getMazeFromString(String mazeString) {
+        PossibleValues[][] mazeV;
         String[] lines = mazeString.split("\n");
-        mazeInt = new int[lines.length][lines.length];
+        mazeV = new PossibleValues[lines.length][lines.length];
         for (int i = 0; i < lines.length; i++) {
             //i-line
             String[] line = lines[i].split("\t");
             for (int j = 0; j < line.length; j++) {
-                mazeInt[i][j] = Integer.parseInt(line[j]);
+                mazeV[i][j] = PossibleValues.valueOf(line[j]);
             }
         }
-        return mazeInt;
+        return mazeV;
     }
 
 }

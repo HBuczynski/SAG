@@ -2,10 +2,12 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MazePanel extends JPanel {
-    int[][] maze;
+    private PossibleValues[][] maze;
+    private int size;
 
-    public MazePanel (int[][] maze){
+    public MazePanel (PossibleValues[][] maze, int sizeValue){
         this.maze = maze;
+        this.size = sizeValue;
     }
 
     public void paint(Graphics g) {
@@ -17,24 +19,32 @@ public class MazePanel extends JPanel {
                 Color newColor;
 
                 switch (maze[i][j]) {
-                    case 1:
+                    case WALL:
                         newColor = Color.BLACK;
                         break;
 
-                    case 0:
+                    case ALLEY:
                         newColor = Color.WHITE;
+                        break;
+
+                    case EXIT:
+                        newColor = Color.WHITE;
+                        break;
+
+                    case MOBILE_WALL:
+                        newColor = Color.YELLOW;
+                        break;
+
+                    case ANT:
+                        newColor = Color.GREEN;
                         break;
 
                     default:
                         newColor = Color.YELLOW;
                 }
                 g.setColor(newColor);
-                g.fillRect(6 * j, 6 * i, 6, 6);
-
-                //grid edges
-                //g.setColor(Color.black);
-
-                g.drawRect(6 * j, 6 * i, 6, 6);
+                g.fillRect(size * j, size * i, size, size);
+                g.drawRect(size * j, size * i, size, size);
             }
         }
     }

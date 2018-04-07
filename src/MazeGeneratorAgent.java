@@ -15,7 +15,7 @@ import java.util.Random;
 public class MazeGeneratorAgent extends Agent{
     private static final int MAZE_HEIGHT = 99;
     private static final int MAZE_WIDTH = 99;
-    private int[][] maze;
+    private PossibleValues[][] maze;
     AID aid;
 
     public void setup(){
@@ -51,7 +51,7 @@ public class MazeGeneratorAgent extends Agent{
         });
     }
 
-    public String generateMazeString(int[][] mazeInt){
+    public String generateMazeString(PossibleValues[][] mazeInt){
         StringBuilder mazeString = new StringBuilder();
         for(int i=0; i<mazeInt.length; i++){
             for(int j=0; j<mazeInt.length; j++){
@@ -66,13 +66,13 @@ public class MazeGeneratorAgent extends Agent{
 
     }
 
-    public int[][] generateMaze() {
-        maze = new int[MAZE_HEIGHT][MAZE_WIDTH];
+    public PossibleValues[][] generateMaze() {
+        maze = new PossibleValues[MAZE_HEIGHT][MAZE_WIDTH];
 
         // Initialize
         for (int i = 0; i < MAZE_HEIGHT; i++)
             for (int j = 0; j < MAZE_WIDTH; j++)
-                maze[i][j] = 1;
+                maze[i][j] = PossibleValues.WALL;
 
         Random rand = new Random();
         // r for row、c for column
@@ -87,7 +87,7 @@ public class MazeGeneratorAgent extends Agent{
             c = rand.nextInt(MAZE_WIDTH);
         }
         // Starting cell
-        maze[r][c] = 0;
+        maze[r][c] = PossibleValues.ALLEY;
 
         //　Allocate the maze with recursive method
         recursion(r, c);
@@ -110,9 +110,9 @@ public class MazeGeneratorAgent extends Agent{
                     //　Whether 2 cells up is out or not
                     if (r-2 <= 0)
                         continue;
-                    if (maze[r - 2][c] != 0) {
-                        maze[r-2][c] = 0;
-                        maze[r-1][c] = 0;
+                    if (maze[r - 2][c] != PossibleValues.ALLEY) {
+                        maze[r-2][c] = PossibleValues.ALLEY;
+                        maze[r-1][c] = PossibleValues.ALLEY;
                         recursion(r - 2, c);
                     }
                     break;
@@ -120,9 +120,9 @@ public class MazeGeneratorAgent extends Agent{
                     // Whether 2 cells to the right is out or not
                     if (c + 2 >= MAZE_WIDTH - 1)
                         continue;
-                    if (maze[r][c + 2] != 0) {
-                        maze[r][c + 2] = 0;
-                        maze[r][c + 1] = 0;
+                    if (maze[r][c + 2] != PossibleValues.ALLEY) {
+                        maze[r][c + 2] = PossibleValues.ALLEY;
+                        maze[r][c + 1] = PossibleValues.ALLEY;
                         recursion(r, c + 2);
                     }
                     break;
@@ -130,9 +130,9 @@ public class MazeGeneratorAgent extends Agent{
                     // Whether 2 cells down is out or not
                     if (r + 2 >= MAZE_HEIGHT - 1)
                         continue;
-                    if (maze[r + 2][c] != 0) {
-                        maze[r+2][c] = 0;
-                        maze[r+1][c] = 0;
+                    if (maze[r + 2][c] != PossibleValues.ALLEY) {
+                        maze[r+2][c] = PossibleValues.ALLEY;
+                        maze[r+1][c] = PossibleValues.ALLEY;
                         recursion(r + 2 , c);
                     }
                     break;
@@ -141,9 +141,9 @@ public class MazeGeneratorAgent extends Agent{
                     if (c - 2 <= 0)
                         continue;
 
-                    if (maze[r][c - 2] != 0) {
-                        maze[r][c - 2] = 0;
-                        maze[r][c - 1] = 0;
+                    if (maze[r][c - 2] != PossibleValues.ALLEY) {
+                        maze[r][c - 2] = PossibleValues.ALLEY;
+                        maze[r][c - 1] = PossibleValues.ALLEY;
                         recursion(r, c - 2);
                     }
                     break;
@@ -156,6 +156,7 @@ public class MazeGeneratorAgent extends Agent{
      * Generate an array with random directions 1-4
      * @return Array containing 4 directions in random order
      */
+
     private int[] generateRandomDirections() {
         ArrayList<Integer> randoms = new ArrayList<>();
         for (int i = 0; i < 4; i++)
@@ -169,49 +170,22 @@ public class MazeGeneratorAgent extends Agent{
         return tab;
     }
 
-    private void createExits(int[][] maze){
-        int MIN_SPACE = 5;
+    private void createExits(PossibleValues[][] maze){
+        Boolean ok = false;
 
-        for(int i = 10; i < MAZE_HEIGHT - 12;i++) {
-            //1 BOTTOM
-            if(maze[maze.length-2][i] == 0 && maze[maze.length-2][i+1] == 0 && maze[maze.length-2][i+2] == 0){
-                maze[maze.length-1][i] = 0;
-                maze[maze.length-1][i+1] = 0;
-                i+=MIN_SPACE;
-                if(i >= MAZE_HEIGHT){
-                    continue;
+        while(!ok) {
+            Random rand = new Random();
+            int randomedColumn = rand.nextInt(MAZE_WIDTH-10)+2;
+            randomedColumn+=2;
+            if(randomedColumn != maze.length-1){
+                if(maze[maze.length-2][randomedColumn] == PossibleValues.ALLEY
+                        && maze[maze.length-2][randomedColumn-1] == PossibleValues.ALLEY
+                        &&maze[maze.length-2][randomedColumn+1] == PossibleValues.ALLEY) {
+                    maze[maze.length-1][randomedColumn] = PossibleValues.EXIT;
+                    maze[maze.length-1][randomedColumn-1] = PossibleValues.EXIT;
+                    ok = true;
                 }
-            }
-            //2 RIGHT
-            if(maze[i][maze.length-2] == 0 && maze[i+1][maze.length-2] == 0 && maze[i+2][maze.length-2] == 0){
-                maze[i][maze.length-1] = 0;
-                maze[i+1][maze.length-1] = 0;
-                i+=MIN_SPACE;
-                if(i>= MAZE_HEIGHT){
-                    continue;
-                }
-                // continue;
-            }
 
-            // 3 TOP
-            if(maze[1][i] == 0 && maze[1][i+1] == 0 && maze[1][i+2] == 0){
-                maze[0][i] = 0;
-                maze[0][i+1] = 0;
-                i+=MIN_SPACE;
-                if(i >= MAZE_HEIGHT){
-                    continue;
-                }
-                //continue;
-            }
-
-            //4 LEFT
-            if(maze[i][1]== 0 && maze[i+1][1] == 0 && maze[i+2][1] == 0) {
-                maze[i][0]=0;
-                maze[i+1][0]=0;
-                i+=MIN_SPACE;
-                if(i >= MAZE_HEIGHT){
-                    continue;
-                }
             }
         }
 
