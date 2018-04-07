@@ -1,0 +1,15 @@
+Existing agents:
+- Maze generator is used to generate random maze and change position of some defined number of walls during execution;
+- Maze drawing agent refreshes view of the maze;
+- Ant agent is used to simulate ant looking for shortest path and generating feromone during it's travel
+- Ant colony agent holds information about existing feromones in maze and it's power
+
+General assumptions:
+- 
+
+
+Parameters used:
+- ants count
+- moving walls count
+- labyrinth size
+- labyrinth density
