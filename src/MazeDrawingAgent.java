@@ -32,7 +32,7 @@ public class MazeDrawingAgent extends Agent {
                     for (DFAgentDescription agent : result) {
                         ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
                         message.addReceiver(agent.getName());
-                        message.setContent("maze_request");
+                        message.setContent(Commands.CommandCode.MAZE_GENERATOR_REQUEST.toString());
                         send(message);
                     }
                 } catch (FIPAException e) {
@@ -48,8 +48,24 @@ public class MazeDrawingAgent extends Agent {
                 receivedMessage = receive(MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
 
                 if (receivedMessage != null) {
-                    maze = getMazeFromString(receivedMessage.getContent());
-                   drawer.redrawMaze(maze);
+
+                    try{
+                        Commands cmd = (Commands)receivedMessage.getContentObject();
+
+                        switch (cmd.getCommandCode())
+                        {
+                            case MAZE_GENERATOR_REQUEST:
+                                MazeGeneratorRequestCommand mazeGeneratorCmd = (MazeGeneratorRequestCommand)receivedMessage.getContentObject();
+                                maze = mazeGeneratorCmd.getMazeValues();
+                                drawer.redrawMaze(maze);
+                        }
+                    }
+                    catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+
+
+
                 } else {
                     block();
                 }

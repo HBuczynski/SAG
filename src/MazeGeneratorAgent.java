@@ -37,12 +37,19 @@ public class MazeGeneratorAgent extends Agent{
         addBehaviour(new CyclicBehaviour() {
             @Override
             public void action() {
-                ACLMessage receivedMessage = receive(MessageTemplate.MatchContent("maze_request"));
+                ACLMessage receivedMessage = receive(MessageTemplate.MatchContent(Commands.CommandCode.MAZE_GENERATOR_REQUEST.toString()));
+
+                MazeGeneratorRequestCommand command = new MazeGeneratorRequestCommand();
+                command.setMazeValues(maze);
 
                 if (receivedMessage != null) {
                     System.out.println(receivedMessage.getContent());
                     ACLMessage reply = receivedMessage.createReply();
-                    reply.setContent(mazeString);/////sendMaze
+                    try {
+                        reply.setContentObject(command);/////sendMaze
+                    }
+                    catch (Exception ex) { ex.printStackTrace(); }
+
                     send(reply);
                 } else {
                     block();
