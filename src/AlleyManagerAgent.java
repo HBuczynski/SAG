@@ -13,6 +13,7 @@ public class AlleyManagerAgent extends Agent{
     private DFAgentDescription[] result;
     private ACLMessage receivedInformMessage;
     private ACLMessage receivedRequestMessage;
+
     private PossibleValues[][] maze;
 
     public void setup() {
