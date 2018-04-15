@@ -1,11 +1,11 @@
-public class AlleyFields extends MazeField {
+public class PheromoneField extends MazeField {
 
     private int antId;
     private int power;
 
-    AlleyFields()
+    PheromoneField()
     {
-        super(FieldCode.ALLEY);
+        super(FieldCode.PHEROMONE);
     }
 
     public void setAntId(int antId)

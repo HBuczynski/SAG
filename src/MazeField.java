@@ -1,7 +1,7 @@
 public class MazeField {
 
     public enum FieldCode {
-        WALL, ALLEY, EXIT, MOBILE_WALL, ANT
+        WALL, PHEROMONE, EXIT, MOBILE_WALL, ANT
     }
 
     private FieldCode value;
