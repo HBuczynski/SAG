@@ -27,13 +27,13 @@ public class AntPositionInformCommand extends Command
         this.newPosition = point;
     }
 
-    public boolean getPheromonePosition()
+    public boolean pheromoneExist()
     {
 
         return pheromone;
     }
 
-    public void setPheromonePosition(boolean state)
+    public void leavePheromone(boolean state)
     {
 
         this.pheromone = state;

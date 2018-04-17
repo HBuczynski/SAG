@@ -18,6 +18,8 @@ public class MazeManagerAgent extends Agent{
 
     private static final int MAZE_HEIGHT = 99;
     private static final int MAZE_WIDTH = 99;
+    private static final int DECREASING_PHEROMONE_VALUE = 10;
+
     private MazeField[][] maze;
 
     AID aid;
@@ -45,7 +47,6 @@ public class MazeManagerAgent extends Agent{
         addBehaviour(new TickerBehaviour(this, 500) {
             @Override
             protected void onTick() {
-                // TBD
                 updatePheromons();
             }
         });
@@ -54,7 +55,7 @@ public class MazeManagerAgent extends Agent{
             @Override
             protected void onTick() {
                 // TBD
-                maze = generateMaze();
+                // Update maze - moving walls
             }
         });
 
@@ -93,6 +94,10 @@ public class MazeManagerAgent extends Agent{
                                 Point antPosition = antNeighborhoodRequestCommand.getCurrentPosition();
 
                                 //TO DO: send matrix
+                                // example:
+                                // 1 1 1
+                                // 1 0 1
+                                // 1 1 1
 
                                 try {
                                     message.setContentObject(neighbourhoodInformCommand);
@@ -125,7 +130,12 @@ public class MazeManagerAgent extends Agent{
                         switch (cmd.getCommandCode())
                         {
                             case ANT_POSITION_INFORM:
-                                // TO DO: ADD ant to the maze and pheromon.
+                                AntPositionInformCommand positionInformCommand = (AntPositionInformCommand) receivedMessage.getContentObject();
+
+                                Point position = positionInformCommand.getNewPosition();
+                                maze[position.x][position.y] = new MazeField(MazeField.FieldCode.ANT);
+
+                                break;
                         }
                     }
                     catch (Exception ex) {
@@ -281,6 +291,19 @@ public class MazeManagerAgent extends Agent{
 
     private void updatePheromons()
     {
+        for (int i = 0; i < maze.length; i++) {
+            for (int j = 0; j < maze[0].length; j++) {
+                if(maze[i][j].getValue() == MazeField.FieldCode.PHEROMONE)
+                {
+                    int newPower = ((PheromoneField)maze[i][j]).getPower() - DECREASING_PHEROMONE_VALUE;
+                    ((PheromoneField)maze[i][j]).setPower(newPower);
 
+                    if(newPower <=0)
+                    {
+                        maze[i][j] = new MazeField(MazeField.FieldCode.ALLEY);
+                    }
+                }
+            }
+        }
     }
 }
