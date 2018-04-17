@@ -1,6 +1,7 @@
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.TickerBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
@@ -41,6 +42,22 @@ public class MazeManagerAgent extends Agent{
             System.out.println(ex.getMessage());
         }
 
+        addBehaviour(new TickerBehaviour(this, 500) {
+            @Override
+            protected void onTick() {
+                // TBD
+                updatePheromons();
+            }
+        });
+
+        addBehaviour(new TickerBehaviour(this, 1000) {
+            @Override
+            protected void onTick() {
+                // TBD
+                maze = generateMaze();
+            }
+        });
+
         addBehaviour(new CyclicBehaviour() {
             @Override
             public void action() {
@@ -68,6 +85,7 @@ public class MazeManagerAgent extends Agent{
                                 System.out.println(Command.CommandCode.MAZE_REQUEST.toString());
                                 send(message);
                                 break;
+
                             case ANT_NEIGHBORHOOD_REQUEST:
                                 AntNeighbourhoodRequestCommand antNeighborhoodRequestCommand = (AntNeighbourhoodRequestCommand) receivedMessage.getContentObject();
                                 AntNeighbourhoodInformCommand neighbourhoodInformCommand = new AntNeighbourhoodInformCommand();
@@ -107,7 +125,7 @@ public class MazeManagerAgent extends Agent{
                         switch (cmd.getCommandCode())
                         {
                             case ANT_POSITION_INFORM:
-                                // TO DO: ADD ant to the maze
+                                // TO DO: ADD ant to the maze and pheromon.
                         }
                     }
                     catch (Exception ex) {
@@ -258,6 +276,11 @@ public class MazeManagerAgent extends Agent{
 
             }
         }
+
+    }
+
+    private void updatePheromons()
+    {
 
     }
 }
