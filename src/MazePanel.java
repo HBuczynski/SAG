@@ -2,10 +2,10 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MazePanel extends JPanel {
-    private PossibleValues[][] maze;
+    private MazeField[][] maze;
     private int size;
 
-    public MazePanel (PossibleValues[][] maze, int sizeValue){
+    public MazePanel (MazeField[][] maze, int sizeValue){
         this.maze = maze;
         this.size = sizeValue;
     }
@@ -18,7 +18,7 @@ public class MazePanel extends JPanel {
             for (int j = 0; j < maze[0].length; j++) {
                 Color newColor;
 
-                switch (maze[i][j]) {
+                switch (maze[i][j].getValue()) {
                     case WALL:
                         newColor = Color.BLACK;
                         break;

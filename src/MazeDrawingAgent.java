@@ -11,7 +11,7 @@ import jade.lang.acl.MessageTemplate;
 public class MazeDrawingAgent extends Agent {
     private DFAgentDescription[] result;
     private ACLMessage receivedMessage;
-    private PossibleValues[][] maze;
+    private MazeField[][] maze;
 
 
     public void setup() {
@@ -29,33 +29,43 @@ public class MazeDrawingAgent extends Agent {
 
                 try {
                     result = DFService.search(MazeDrawingAgent.this, template);
+
+                    Command mazeRequest = new Command(Command.CommandCode.MAZE_REQUEST);
+
                     for (DFAgentDescription agent : result) {
                         ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
                         message.addReceiver(agent.getName());
-                        message.setContent(Commands.CommandCode.MAZE_GENERATOR_REQUEST.toString());
+
+                        try
+                        {
+                            message.setContentObject(mazeRequest);
+                        }
+                        catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+
                         send(message);
                     }
                 } catch (FIPAException e) {
                     e.printStackTrace();
                 }
-
             }
         });
 
         addBehaviour(new CyclicBehaviour() {
             @Override
             public void action() {
-                receivedMessage = receive(MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
+                receivedMessage = receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
 
                 if (receivedMessage != null) {
 
                     try{
-                        Commands cmd = (Commands)receivedMessage.getContentObject();
+                        Command cmd = (Command)receivedMessage.getContentObject();
 
                         switch (cmd.getCommandCode())
                         {
-                            case MAZE_GENERATOR_REQUEST:
-                                MazeGeneratorRequestCommand mazeGeneratorCmd = (MazeGeneratorRequestCommand)receivedMessage.getContentObject();
+                            case MAZE_INFORM:
+                                MazeInformCommand mazeGeneratorCmd = (MazeInformCommand) receivedMessage.getContentObject();
                                 maze = mazeGeneratorCmd.getMazeValues();
                                 drawer.redrawMaze(maze);
                         }
@@ -63,8 +73,6 @@ public class MazeDrawingAgent extends Agent {
                     catch (Exception ex) {
                         ex.printStackTrace();
                     }
-
-
 
                 } else {
                     block();
@@ -75,19 +83,4 @@ public class MazeDrawingAgent extends Agent {
 
     protected void takeDown() {
     }
-
-    private PossibleValues[][] getMazeFromString(String mazeString) {
-        PossibleValues[][] mazeV;
-        String[] lines = mazeString.split("\n");
-        mazeV = new PossibleValues[lines.length][lines.length];
-        for (int i = 0; i < lines.length; i++) {
-            //i-line
-            String[] line = lines[i].split("\t");
-            for (int j = 0; j < line.length; j++) {
-                mazeV[i][j] = PossibleValues.valueOf(line[j]);
-            }
-        }
-        return mazeV;
-    }
-
 }

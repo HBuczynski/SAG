@@ -37,8 +37,8 @@ public class ContentDrawer {
         jMazePanel = new JPanel();
         jMazePanel.setLayout(new BoxLayout(jMazePanel, BoxLayout.Y_AXIS));
         jMazePanel.setPreferredSize(new Dimension(MAZE_PANE_WIDTH, MAZE_PANE_HEIGHT));
-        PossibleValues[][] emptyMaze = new PossibleValues[1][1];
-        emptyMaze[0][0] = PossibleValues.ALLEY;
+        MazeField[][] emptyMaze = new MazeField[1][1];
+        emptyMaze[0][0] =  new MazeField(MazeField.FieldCode.ALLEY);
         jMazePanel.add(drawMazePanel(emptyMaze));
 
         JPanel contentPane = new JPanel();
@@ -95,14 +95,14 @@ public class ContentDrawer {
     }
 
 
-    private MazePanel drawMazePanel(PossibleValues[][] generatedMaze){
+    private MazePanel drawMazePanel(MazeField[][] generatedMaze){
         mazePanel = new MazePanel(generatedMaze, RECTANGLE_SIZE);
         mazePanel.setPreferredSize(new Dimension(MAZE_PANE_WIDTH, MAZE_PANE_HEIGHT));
         mazePanel.setBackground(backgroundColor);
         return mazePanel;
     }
 
-    public void redrawMaze(PossibleValues[][] newMaze){
+    public void redrawMaze(MazeField[][] newMaze){
         jMazePanel.remove(mazePanel);
         jMazePanel.add(drawMazePanel(newMaze));
         frame.revalidate();
