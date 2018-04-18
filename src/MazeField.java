@@ -1,7 +1,9 @@
-public class MazeField {
+import java.io.Serializable;
+
+public class MazeField implements Serializable {
 
     public enum FieldCode {
-        WALL, PHEROMONE, EXIT, MOBILE_WALL, ANT
+        WALL, PHEROMONE, EXIT, MOBILE_WALL, ANT, ALLEY
     }
 
     private FieldCode value;
