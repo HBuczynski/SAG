@@ -8,6 +8,7 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import java.util.Vector;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -16,8 +17,8 @@ import java.util.Random;
 
 public class MazeManagerAgent extends Agent{
 
-    private static final int MAZE_HEIGHT = 99;
-    private static final int MAZE_WIDTH = 99;
+    public static final int MAZE_HEIGHT = 99;
+    public static final int MAZE_WIDTH = 99;
 
     private MazeField[][] maze;
 
@@ -94,12 +95,18 @@ public class MazeManagerAgent extends Agent{
 
                                 //Sending information about four neighbouring fields: northern, eastern, southern, western
                                 //(in that order):
-                                MazeField[] neighbourhood = new MazeField[4];
-                                neighbourhood[0] = maze[antPosition.x][antPosition.y+1];
-                                neighbourhood[1] = maze[antPosition.x+1][antPosition.y];
-                                neighbourhood[2] = maze[antPosition.x][antPosition.y-1];
-                                neighbourhood[3] = maze[antPosition.x-1][antPosition.y];
+                                Vector<MazeField> neighbourhood = new Vector<MazeField>(4);
+                                for(int i = -1; i < 2; i+=2) {
+                                    if(antPosition.x + i > 0 && antPosition.x + i < MAZE_HEIGHT)
+                                        if (maze[antPosition.x + i][antPosition.y].getValue() != MazeField.FieldCode.WALL &&
+                                                maze[antPosition.x + i][antPosition.y].getValue() != MazeField.FieldCode.MOBILE_WALL)
+                                            neighbourhood.add(maze[antPosition.x + i][antPosition.y]);
 
+                                    if(antPosition.y + i > 0 && antPosition.y + i < MAZE_WIDTH)
+                                        if (maze[antPosition.x][antPosition.y + i].getValue() != MazeField.FieldCode.WALL &&
+                                                maze[antPosition.x][antPosition.y +i].getValue() != MazeField.FieldCode.MOBILE_WALL)
+                                            neighbourhood.add(maze[antPosition.x][antPosition.y + i]);
+                                }
                                 neighbourhoodInformCommand.setMazeValues(neighbourhood);
                                 try {
                                     message.setContentObject(neighbourhoodInformCommand);
@@ -115,6 +122,9 @@ public class MazeManagerAgent extends Agent{
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
+                }
+                else{
+                    block();
                 }
             }
         });
@@ -166,7 +176,7 @@ public class MazeManagerAgent extends Agent{
 
     public void takeDown(){
         try { DFService.deregister(this); }
-        catch (Exception e) { ex.printStackTrace();}
+        catch (Exception ex) { ex.printStackTrace();}
     }
 
     public MazeField[][] generateMaze() {
@@ -174,8 +184,11 @@ public class MazeManagerAgent extends Agent{
 
         // Initialize
         for (int i = 0; i < MAZE_HEIGHT; i++)
-            for (int j = 0; j < MAZE_WIDTH; j++)
+            for (int j = 0; j < MAZE_WIDTH; j++) {
                 maze[i][j] = new MazeField(MazeField.FieldCode.WALL);
+                maze[i][j].setCoordinateX(i);
+                maze[i][j].setCoordinateY(j);
+            }
 
         Random rand = new Random();
         // r for row、c for column
@@ -216,6 +229,8 @@ public class MazeManagerAgent extends Agent{
                     if (maze[r - 2][c].getValue() != MazeField.FieldCode.ALLEY) {
                         maze[r-2][c].setValue(MazeField.FieldCode.ALLEY);
                         maze[r-1][c].setValue(MazeField.FieldCode.ALLEY);
+                        maze[r-2][c].setPheromonePower(0.1);
+                        maze[r-1][c].setPheromonePower(0.1);
                         recursion(r - 2, c);
                     }
                     break;
@@ -226,6 +241,8 @@ public class MazeManagerAgent extends Agent{
                     if (maze[r][c + 2].getValue() != MazeField.FieldCode.ALLEY) {
                         maze[r][c + 2].setValue(MazeField.FieldCode.ALLEY);
                         maze[r][c + 1].setValue(MazeField.FieldCode.ALLEY);
+                        maze[r][c + 2].setPheromonePower(0.1);
+                        maze[r][c + 1].setPheromonePower(0.1);
                         recursion(r, c + 2);
                     }
                     break;
@@ -236,6 +253,8 @@ public class MazeManagerAgent extends Agent{
                     if (maze[r + 2][c].getValue() != MazeField.FieldCode.ALLEY) {
                         maze[r+2][c].setValue(MazeField.FieldCode.ALLEY);
                         maze[r+1][c].setValue(MazeField.FieldCode.ALLEY);
+                        maze[r+2][c].setPheromonePower(0.1);
+                        maze[r+1][c].setPheromonePower(0.1);
                         recursion(r + 2 , c);
                     }
                     break;
@@ -247,6 +266,8 @@ public class MazeManagerAgent extends Agent{
                     if (maze[r][c - 2].getValue() != MazeField.FieldCode.ALLEY) {
                         maze[r][c - 2].setValue(MazeField.FieldCode.ALLEY);
                         maze[r][c - 1].setValue(MazeField.FieldCode.ALLEY);
+                        maze[r][c - 2].setPheromonePower(0.1);
+                        maze[r][c - 1].setPheromonePower(0.1);
                         recursion(r, c - 2);
                     }
                     break;
@@ -300,7 +321,7 @@ public class MazeManagerAgent extends Agent{
             for (int j = 0; j < maze[0].length; ++j) {
                 if(maze[i][j].getValue() == MazeField.FieldCode.ANT || maze[i][j].getValue() == MazeField.FieldCode.ALLEY)
                 {
-                   maze[i][j].setPheromonePower(maze[i][j].getPheromonePower()*(1-EVAPORATION_COEFF));
+                   maze[i][j].setPheromonePower(maze[i][j].getPheromonePower()*(1-MazeField.EVAPORATION_COEFF));
                 }
             }
         }

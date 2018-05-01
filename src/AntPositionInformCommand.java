@@ -8,7 +8,7 @@ public class AntPositionInformCommand extends Command
     public AntPositionInformCommand()
     {
         super(CommandCode.ANT_POSITION_INFORM);
-
+        newPosition = new Point();
         this.newPosition.x = 9999999;
         this.newPosition.y = 9999999;
 

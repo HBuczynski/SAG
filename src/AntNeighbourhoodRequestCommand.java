@@ -6,7 +6,7 @@ public class AntNeighbourhoodRequestCommand extends Command {
     public AntNeighbourhoodRequestCommand() {
 
         super(CommandCode.ANT_NEIGHBORHOOD_REQUEST);
-
+        currentPosition = new Point();
         this.currentPosition.x = 9999999;
         this.currentPosition.y = 9999999;
     }

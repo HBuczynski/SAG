@@ -1,18 +1,29 @@
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
-import java.awt.*;
+import jade.core.behaviours.CyclicBehaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.domain.FIPAException;
+import jade.lang.acl.MessageTemplate;
+import java.util.Random;
+import java.util.Vector;
+import java.awt.Point;
 
 public class AntAgent extends Agent {
-    private int coordinateX, coordinateY, distance;
+    private DFAgentDescription[] result;
+    private int coordinateX, coordinateY, previousCoordinateX, previousCoordinateY, distance;
 
-    private string mazeManagerId;
+    private String mazeManagerId;
 
     public void setCoordinateX(int coordX) {
+        previousCoordinateX = coordinateX;
         coordinateX = coordX;
     }
 
     public void setCoordinateY(int coordY) {
+        previousCoordinateY = coordinateY;
         coordinateY = coordY;
     }
 
@@ -21,11 +32,19 @@ public class AntAgent extends Agent {
     }
 
     public int getCoordinateX() {
-        return coordX;
+        return coordinateX;
     }
 
     public int getCoordinateY() {
-        return coordY;
+        return coordinateY;
+    }
+
+    public int getPreviousCoordinateX() {
+        return previousCoordinateX;
+    }
+
+    public int getPreviousCoordinateY() {
+        return previousCoordinateY;
     }
 
     public int getDistance() {
@@ -44,6 +63,7 @@ public class AntAgent extends Agent {
                // message.setConversationId("FirstLocationQuestion");
                 setCoordinateX(1);
                 setCoordinateY(1);
+                setDistance(1);
                 System.out.println("Ant placed");
             }
         });
@@ -59,8 +79,11 @@ public class AntAgent extends Agent {
                 try {
                     result = DFService.search(AntAgent.this, template);
 
-                    Command antRequest = new Command(Command.CommandCode.ANT_NEIGHBOURHOOD_REQUEST);
-
+                    AntNeighbourhoodRequestCommand antRequest = new AntNeighbourhoodRequestCommand();
+                    Point position = new Point();
+                    position.x = getCoordinateX();
+                    position.y = getCoordinateY();
+                    antRequest.setCurrentPosition(position);
                     for (DFAgentDescription agent : result) {
                         ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
                         message.addReceiver(agent.getName());
@@ -71,7 +94,7 @@ public class AntAgent extends Agent {
                         catch (Exception ex) {
                             ex.printStackTrace();
                         }
-                        System.out.println(Command.CommandCode.ANT_NEIGHBOURHOOD_REQUEST.toString());
+                        System.out.println(Command.CommandCode.ANT_NEIGHBORHOOD_REQUEST.toString());
                         send(message);
                     }
                 } catch (FIPAException e) {
@@ -88,14 +111,15 @@ public class AntAgent extends Agent {
                         message.addReceiver(receivedMessage.getSender());
 
                         switch (cmd.getCommandCode()) {
-                            case ANT_NEIGHBOURHOOD_INFORM:
-                                MazeField[] maze = cmd.getMazeValues();
+                            case ANT_NEIGHBORHOOD_INFORM:
+                                AntNeighbourhoodInformCommand neighbourhoodInformCommand = (AntNeighbourhoodInformCommand) cmd;
+                                Vector<MazeField> maze = neighbourhoodInformCommand.getMazeValues();
                                 boolean isExit = setNextMove(maze);
-                                Point newPosition;
-                                newPosition.x = this.coordinateX;
-                                newPosition.y = this.coordinateY;
+                                Point newPosition = new Point();
+                                newPosition.x = getCoordinateX();
+                                newPosition.y = getCoordinateY();
                                 positionInformCommand.setNewPosition(newPosition);
-                                positionInformCommand.setDistance(this.distance);
+                                positionInformCommand.setDistance(getDistance());
 
                                 try
                                 {
@@ -111,62 +135,57 @@ public class AntAgent extends Agent {
                                 }
                                 break;
                         }
+                    }catch(Exception ex){
+                        ex.printStackTrace();
                     }
                 }
                 else{
                     block();
                 }
-            });
-
-        }
-
-
+            }
+        });
     }
-    public boolean setNextMove(MazeField[] maze){
-        for(int i = 0; i < maze.length(); ++i){
-            if(maze[i].getValue() == MazeField.FieldCode.EXIT){
-                makeMove(i);
-                return;
+    public boolean setNextMove(Vector<MazeField> maze){
+        for(int i = 0; i < maze.size(); ++i){
+            if(maze.get(i).getValue() == MazeField.FieldCode.EXIT){
+                makeMove(maze.get(i));
+                return true;
             }
         }
         double sumPheromonePower = 0;
-        double [] distribution  = new double[maze.length()];
-        for(int i = 0; i < maze.length(); ++i){
-            sumPheromonePower+=maze[i].getPheromonePower();
-            if(i != 0)
-                distribution[i] = distribution[i-1] + maze[i].getPheromonePower();
-            else
-                distribution[i] = maze[i].getPheromonePower();
-        }
-        for(element:distribution){
-            element = element/sumPheromonePower;
-        }
-        Random generator = new Random();
-        double random = nextDouble();
-        int chosenIndex = maze.length()-1;
-        for(int i = 0; i < distribution.length() - 1; ++i){
-            if(random < distribution[i] && distribution[i] != distribution[i+1]) {
-                makeMove(i);
-                break;
+        double [] distribution  = new double[maze.size()];
+        for(int i = 0; i < maze.size(); ++i){
+            if(maze.get(i).getCoordinateX() != getPreviousCoordinateX() || maze.get(i).getCoordinateY() != getPreviousCoordinateY()){
+                sumPheromonePower += maze.get(i).getPheromonePower();
+                if(i != 0)
+                    distribution[i] = distribution[i-1] + maze.get(i).getPheromonePower();
+                else
+                    distribution[i] = maze.get(i).getPheromonePower();
+            }
+            else{
+                distribution[i] = 0;
             }
         }
+        for(int i = 0; i < distribution.length; ++i){
+            distribution[i] /= sumPheromonePower;
+        }
+        Random generator = new Random();
+        double random = generator.nextDouble();
+        for(int i = 0; i < distribution.length; ++i){
+            if(random < distribution[i]) {
+                makeMove(maze.get(i));
+                return false;
+            }
+        }
+     //   setCoordinateX(getCoordinateX());
+      //  setCoordinateY(getCoordinateY());
+       // ++distance;
+        return false;
     }
 
-    public void makeMove(int fieldIndex){
-        switch (fieldIndex){
-            case 0:
-                this.coordinateX += 1;
-                break;
-            case 1:
-                this.coordinateY += 1;
-                break;
-            case 2:
-                this.coordinateX -= 1;
-                break;
-            case 3:
-                this.coordinateY -= 1;
-                break;
-        }
-        ++this.distance;
+    public void makeMove(MazeField field){
+        setCoordinateY(field.getCoordinateY());
+        setCoordinateX(field.getCoordinateX());
+        ++distance;
     }
 }

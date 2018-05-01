@@ -1,16 +1,17 @@
+import java.util.Vector;
 
 public class AntNeighbourhoodInformCommand extends Command {
-    private MazeField[] maze;
+    private Vector<MazeField> maze;
 
     public AntNeighbourhoodInformCommand() {
         super(CommandCode.ANT_NEIGHBORHOOD_INFORM);
     }
 
-    public MazeField[] getMazeValues() {
+    public Vector<MazeField> getMazeValues() {
         return this.maze;
     }
 
-    public void setMazeValues(MazeField[][] maze) {
+    public void setMazeValues(Vector<MazeField> maze) {
         this.maze = maze;
     }
 }
