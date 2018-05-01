@@ -18,7 +18,6 @@ public class MazeManagerAgent extends Agent{
 
     private static final int MAZE_HEIGHT = 99;
     private static final int MAZE_WIDTH = 99;
-    private static final int DECREASING_PHEROMONE_VALUE = 10;
 
     private MazeField[][] maze;
 
@@ -93,12 +92,15 @@ public class MazeManagerAgent extends Agent{
 
                                 Point antPosition = antNeighborhoodRequestCommand.getCurrentPosition();
 
-                                //TO DO: send matrix
-                                // example:
-                                // 1 1 1
-                                // 1 0 1
-                                // 1 1 1
+                                //Sending information about four neighbouring fields: northern, eastern, southern, western
+                                //(in that order):
+                                MazeField[] neighbourhood = new MazeField[4];
+                                neighbourhood[0] = maze[antPosition.x][antPosition.y+1];
+                                neighbourhood[1] = maze[antPosition.x+1][antPosition.y];
+                                neighbourhood[2] = maze[antPosition.x][antPosition.y-1];
+                                neighbourhood[3] = maze[antPosition.x-1][antPosition.y];
 
+                                neighbourhoodInformCommand.setMazeValues(neighbourhood);
                                 try {
                                     message.setContentObject(neighbourhoodInformCommand);
                                 } catch (Exception ex) {
@@ -132,9 +134,11 @@ public class MazeManagerAgent extends Agent{
                             case ANT_POSITION_INFORM:
                                 AntPositionInformCommand positionInformCommand = (AntPositionInformCommand) receivedMessage.getContentObject();
 
-                                Point position = positionInformCommand.getNewPosition();
-                                maze[position.x][position.y] = new MazeField(MazeField.FieldCode.ANT);
-
+                                Point newPosition = positionInformCommand.getNewPosition();
+                                int antDistance = positionInformCommand.getDistance();
+                                maze[newPosition.x][newPosition.y].setValue(MazeField.FieldCode.ANT);
+                                maze[newPosition.x][newPosition.y].setPheromonePower(maze[newPosition.x][newPosition.y].getPheromonePower()+1.0/(double)antDistance);
+                                System.out.println(Command.CommandCode.ANT_POSITION_INFORM.toString());
                                 break;
                         }
                     }
@@ -161,7 +165,8 @@ public class MazeManagerAgent extends Agent{
     }
 
     public void takeDown(){
-
+        try { DFService.deregister(this); }
+        catch (Exception e) { ex.printStackTrace();}
     }
 
     public MazeField[][] generateMaze() {
@@ -291,17 +296,11 @@ public class MazeManagerAgent extends Agent{
 
     private void updatePheromons()
     {
-        for (int i = 0; i < maze.length; i++) {
-            for (int j = 0; j < maze[0].length; j++) {
-                if(maze[i][j].getValue() == MazeField.FieldCode.PHEROMONE)
+        for (int i = 0; i < maze.length; ++i) {
+            for (int j = 0; j < maze[0].length; ++j) {
+                if(maze[i][j].getValue() == MazeField.FieldCode.ANT || maze[i][j].getValue() == MazeField.FieldCode.ALLEY)
                 {
-                    int newPower = ((PheromoneField)maze[i][j]).getPower() - DECREASING_PHEROMONE_VALUE;
-                    ((PheromoneField)maze[i][j]).setPower(newPower);
-
-                    if(newPower <=0)
-                    {
-                        maze[i][j] = new MazeField(MazeField.FieldCode.ALLEY);
-                    }
+                   maze[i][j].setPheromonePower(maze[i][j].getPheromonePower()*(1-EVAPORATION_COEFF));
                 }
             }
         }

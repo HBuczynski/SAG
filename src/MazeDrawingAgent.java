@@ -19,7 +19,7 @@ public class MazeDrawingAgent extends Agent {
         drawer.drawContent();
 
 
-        addBehaviour(new TickerBehaviour(this, 1000) {
+        addBehaviour(new TickerBehaviour(this, 200) {
             @Override
             protected void onTick() {
                 DFAgentDescription template = new DFAgentDescription();
@@ -43,7 +43,7 @@ public class MazeDrawingAgent extends Agent {
                         catch (Exception ex) {
                             ex.printStackTrace();
                         }
-
+                        System.out.println(Command.CommandCode.MAZE_REQUEST.toString());
                         send(message);
                     }
                 } catch (FIPAException e) {
@@ -68,6 +68,7 @@ public class MazeDrawingAgent extends Agent {
                                 MazeInformCommand mazeGeneratorCmd = (MazeInformCommand) receivedMessage.getContentObject();
                                 maze = mazeGeneratorCmd.getMazeValues();
                                 drawer.redrawMaze(maze);
+                                System.out.println(Command.CommandCode.MAZE_INFORM.toString());
                         }
                     }
                     catch (Exception ex) {

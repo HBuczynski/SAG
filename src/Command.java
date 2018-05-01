@@ -28,7 +28,7 @@ public class Command implements Serializable
         ANT_NEIGHBORHOOD_REQUEST{
             @Override
             public String toString() {
-                return "ANT_NEIGHBORHOOD";
+                return "ANT_NEIGHBORHOOD_REQUEST";
             }
         },
 

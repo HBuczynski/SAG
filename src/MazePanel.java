@@ -28,7 +28,7 @@ public class MazePanel extends JPanel {
                         break;
 
                     case EXIT:
-                        newColor = Color.WHITE;
+                        newColor = Color.RED;
                         break;
 
                     case MOBILE_WALL:

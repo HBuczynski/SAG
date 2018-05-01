@@ -3,7 +3,7 @@ import java.awt.*;
 public class AntPositionInformCommand extends Command
 {
     private Point newPosition;
-    private boolean pheromone;
+    private int distance;
 
     public AntPositionInformCommand()
     {
@@ -12,7 +12,7 @@ public class AntPositionInformCommand extends Command
         this.newPosition.x = 9999999;
         this.newPosition.y = 9999999;
 
-        pheromone = false;
+        this.distance = 0;
     }
 
     public Point getNewPosition()
@@ -27,16 +27,14 @@ public class AntPositionInformCommand extends Command
         this.newPosition = point;
     }
 
-    public boolean pheromoneExist()
+    public int getDistance()
     {
-
-        return pheromone;
+        return distance;
     }
 
-    public void leavePheromone(boolean state)
+    public void setDistance(int dist)
     {
-
-        this.pheromone = state;
+        this.distance = dist;
     }
 }
 

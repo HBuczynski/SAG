@@ -1,12 +1,12 @@
 
 public class AntNeighbourhoodInformCommand extends Command {
-    private MazeField[][] maze;
+    private MazeField[] maze;
 
     public AntNeighbourhoodInformCommand() {
         super(CommandCode.ANT_NEIGHBORHOOD_INFORM);
     }
 
-    public MazeField[][] getMazeValues() {
+    public MazeField[] getMazeValues() {
         return this.maze;
     }
 
