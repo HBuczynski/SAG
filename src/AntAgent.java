@@ -87,11 +87,9 @@ public class AntAgent extends Agent {
                     for (DFAgentDescription agent : result) {
                         ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
                         message.addReceiver(agent.getName());
-                        try
-                        {
+                        try {
                             message.setContentObject(antRequest);
-                        }
-                        catch (Exception ex) {
+                        } catch (Exception ex) {
                             ex.printStackTrace();
                         }
                         System.out.println(Command.CommandCode.ANT_NEIGHBORHOOD_REQUEST.toString());
@@ -100,51 +98,50 @@ public class AntAgent extends Agent {
                 } catch (FIPAException e) {
                     e.printStackTrace();
                 }
-                ACLMessage receivedMessage = receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+                ACLMessage receivedMessage = blockingReceive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
                 AntPositionInformCommand positionInformCommand = new AntPositionInformCommand();
-                if (receivedMessage != null) {
+                try {
+                    Command cmd = (Command) receivedMessage.getContentObject();
+                    ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+                    message.addReceiver(receivedMessage.getSender());
 
-                    try {
-                        Command cmd = (Command) receivedMessage.getContentObject();
-
-                        ACLMessage message = new ACLMessage(ACLMessage.INFORM);
-                        message.addReceiver(receivedMessage.getSender());
-
-                        switch (cmd.getCommandCode()) {
-                            case ANT_NEIGHBORHOOD_INFORM:
-                                AntNeighbourhoodInformCommand neighbourhoodInformCommand = (AntNeighbourhoodInformCommand) cmd;
-                                Vector<MazeField> maze = neighbourhoodInformCommand.getMazeValues();
-                                boolean isExit = setNextMove(maze);
-                                Point newPosition = new Point();
-                                newPosition.x = getCoordinateX();
-                                newPosition.y = getCoordinateY();
-                                positionInformCommand.setNewPosition(newPosition);
-                                positionInformCommand.setDistance(getDistance());
-
-                                try
-                                {
-                                    message.setContentObject(positionInformCommand);
-                                }
-                                catch (Exception ex) {
-                                    ex.printStackTrace();
-                                }
-                                System.out.println(Command.CommandCode.ANT_POSITION_INFORM.toString());
-                                send(message);
-                                if(isExit){
-                                    return;
-                                }
-                                break;
-                        }
-                    }catch(Exception ex){
-                        ex.printStackTrace();
+                    switch (cmd.getCommandCode()) {
+                        case ANT_NEIGHBORHOOD_INFORM:
+                            AntNeighbourhoodInformCommand neighbourhoodInformCommand = (AntNeighbourhoodInformCommand) cmd;
+                            Vector<MazeField> maze = neighbourhoodInformCommand.getMazeValues();
+                            boolean isExit = setNextMove(maze);
+                            Point newPosition = new Point();
+                            newPosition.x = getCoordinateX();
+                            newPosition.y = getCoordinateY();
+                            positionInformCommand.setNewPosition(newPosition);
+                            positionInformCommand.setDistance(getDistance());
+                            Point oldPosition = new Point();
+                            oldPosition.x = getPreviousCoordinateX();
+                            oldPosition.y = getPreviousCoordinateY();
+                            positionInformCommand.setOldPosition(oldPosition);
+                            try {
+                                message.setContentObject(positionInformCommand);
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                            System.out.println(Command.CommandCode.ANT_POSITION_INFORM.toString());
+                            send(message);
+                            if (isExit) {
+                                return;
+                            }
+                            break;
                     }
-                }
-                else{
-                    block();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
             }
         });
     }
+
+    protected void takeDown() {
+        //TODO Clear position with ant
+    }
+
     public boolean setNextMove(Vector<MazeField> maze){
         for(int i = 0; i < maze.size(); ++i){
             if(maze.get(i).getValue() == MazeField.FieldCode.EXIT){
@@ -177,9 +174,9 @@ public class AntAgent extends Agent {
                 return false;
             }
         }
-     //   setCoordinateX(getCoordinateX());
-      //  setCoordinateY(getCoordinateY());
-       // ++distance;
+        setCoordinateX(getCoordinateX());
+        setCoordinateY(getCoordinateY());
+        ++distance;
         return false;
     }
 

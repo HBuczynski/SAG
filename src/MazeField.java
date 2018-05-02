@@ -2,7 +2,7 @@ import java.io.Serializable;
 
 public class MazeField implements Serializable {
 
-    public static final double EVAPORATION_COEFF = 0.2;
+    public static final double EVAPORATION_COEFF = 0.1;
 
     public enum FieldCode {
         WALL, EXIT, MOBILE_WALL, ANT, ALLEY
@@ -16,7 +16,7 @@ public class MazeField implements Serializable {
     {
         this.value = value;
         if(value == FieldCode.ALLEY || value == FieldCode.ANT){
-            this.pheromonePower = 0.1;
+            this.pheromonePower = 0.5;
         }
         else {
             this.pheromonePower = 0;

@@ -10,7 +10,6 @@ import jade.lang.acl.MessageTemplate;
 
 public class MazeDrawingAgent extends Agent {
     private DFAgentDescription[] result;
-    private ACLMessage receivedMessage;
     private MazeField[][] maze;
 
 
@@ -19,9 +18,9 @@ public class MazeDrawingAgent extends Agent {
         drawer.drawContent();
 
 
-        addBehaviour(new TickerBehaviour(this, 200) {
+        addBehaviour(new CyclicBehaviour() {
             @Override
-            protected void onTick() {
+            public void action() {
                 DFAgentDescription template = new DFAgentDescription();
                 ServiceDescription sd = new ServiceDescription();
                 sd.setType("maze");
@@ -49,37 +48,54 @@ public class MazeDrawingAgent extends Agent {
                 } catch (FIPAException e) {
                     e.printStackTrace();
                 }
-            }
-        });
 
-        addBehaviour(new CyclicBehaviour() {
-            @Override
-            public void action() {
-                receivedMessage = receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+                ACLMessage receivedMessage = blockingReceive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+                try{
+                    Command cmd = (Command)receivedMessage.getContentObject();
 
-                if (receivedMessage != null) {
-
-                    try{
-                        Command cmd = (Command)receivedMessage.getContentObject();
-
-                        switch (cmd.getCommandCode())
-                        {
-                            case MAZE_INFORM:
-                                MazeInformCommand mazeGeneratorCmd = (MazeInformCommand) receivedMessage.getContentObject();
-                                maze = mazeGeneratorCmd.getMazeValues();
-                                drawer.redrawMaze(maze);
-                                System.out.println(Command.CommandCode.MAZE_INFORM.toString());
-                        }
+                    switch (cmd.getCommandCode())
+                    {
+                        case MAZE_INFORM:
+                            MazeInformCommand mazeGeneratorCmd = (MazeInformCommand) receivedMessage.getContentObject();
+                            maze = mazeGeneratorCmd.getMazeValues();
+                            drawer.redrawMaze(maze);
+                            System.out.println(Command.CommandCode.MAZE_INFORM.toString());
                     }
-                    catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-
-                } else {
-                    block();
+                }
+                catch (Exception ex) {
+                    ex.printStackTrace();
                 }
             }
         });
+
+//        addBehaviour(new CyclicBehaviour() {
+//            @Override
+//            public void action() {
+//                receivedMessage = receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+//
+//                if (receivedMessage != null) {
+//
+//                    try{
+//                        Command cmd = (Command)receivedMessage.getContentObject();
+//
+//                        switch (cmd.getCommandCode())
+//                        {
+//                            case MAZE_INFORM:
+//                                MazeInformCommand mazeGeneratorCmd = (MazeInformCommand) receivedMessage.getContentObject();
+//                                maze = mazeGeneratorCmd.getMazeValues();
+//                                drawer.redrawMaze(maze);
+//                                System.out.println(Command.CommandCode.MAZE_INFORM.toString());
+//                        }
+//                    }
+//                    catch (Exception ex) {
+//                        ex.printStackTrace();
+//                    }
+//
+//                } else {
+//                    block();
+//                }
+//            }
+//        });
     }
 
     protected void takeDown() {

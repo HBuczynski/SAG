@@ -24,7 +24,15 @@ public class MazePanel extends JPanel {
                         break;
 
                     case ALLEY:
-                        newColor = Color.WHITE;
+                        double pheromone = maze[i][j].getPheromonePower();
+                        if(pheromone > 0.75)
+                            newColor = new Color(255,200,200);
+                        else if(pheromone > 1.0)
+                            newColor = new Color(255,160,160);
+                        else if(pheromone > 1.2)
+                            newColor = new Color(255,100,100);
+                        else
+                            newColor = new Color(255,255,255);
                         break;
 
                     case EXIT:
