@@ -1,5 +1,8 @@
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
+import jade.domain.AMSService;
+import jade.domain.FIPAAgentManagement.AMSAgentDescription;
 import jade.lang.acl.ACLMessage;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
@@ -14,6 +17,8 @@ import java.awt.Point;
 public class AntAgent extends Agent {
     private DFAgentDescription[] result;
     private int coordinateX, coordinateY, previousCoordinateX, previousCoordinateY, distance;
+    private AID aid;
+    private AMSAgentDescription description;
 
     private String mazeManagerId;
 
@@ -54,8 +59,26 @@ public class AntAgent extends Agent {
 
 
     public void setup(){
-        //1. ask where ant could be placed
+        //0. register ant to make ants counting possible
+        aid = new AID();
 
+        DFAgentDescription antDescription = new DFAgentDescription();
+        antDescription.setName(getAID());
+
+        ServiceDescription ant = new ServiceDescription();
+        ant.setType("ant");
+        ant.setName("single_ant");
+        antDescription.addServices(ant);
+
+        try {
+            DFService.register(this, antDescription);
+        }
+
+        catch (FIPAException ex) {
+            System.out.println(ex.getMessage());
+        }
+
+        //1. ask where ant could be placed
         addBehaviour(new OneShotBehaviour() {
             @Override
             public void action() {
@@ -98,11 +121,11 @@ public class AntAgent extends Agent {
                 } catch (FIPAException e) {
                     e.printStackTrace();
                 }
-                ACLMessage receivedMessage = blockingReceive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+                ACLMessage receivedMessage = blockingReceive(MessageTemplateFactory.createInformTemplate());
                 AntPositionInformCommand positionInformCommand = new AntPositionInformCommand();
                 try {
                     Command cmd = (Command) receivedMessage.getContentObject();
-                    ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+                    ACLMessage message = MessageFactory.createInformativeMessage();
                     message.addReceiver(receivedMessage.getSender());
 
                     switch (cmd.getCommandCode()) {

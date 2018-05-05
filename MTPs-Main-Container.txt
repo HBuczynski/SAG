@@ -1,1 +1,1 @@
-http://192.168.0.12:7778/acc
+http://joannas-macbook-air.home:7778/acc

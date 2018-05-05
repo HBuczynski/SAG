@@ -69,7 +69,7 @@ public class MazeManagerAgent extends Agent{
                     try {
                         Command cmd = (Command) receivedMessage.getContentObject();
 
-                        ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+                        ACLMessage message = MessageFactory.createInformativeMessage();
                         message.addReceiver(receivedMessage.getSender());
 
                         switch (cmd.getCommandCode()) {
@@ -132,7 +132,7 @@ public class MazeManagerAgent extends Agent{
         addBehaviour(new CyclicBehaviour() {
             @Override
             public void action() {
-                ACLMessage receivedMessage = receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+                ACLMessage receivedMessage = receive(MessageTemplateFactory.createInformTemplate());
 
                 if (receivedMessage != null) {
 

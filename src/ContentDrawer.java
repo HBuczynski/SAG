@@ -3,7 +3,7 @@ import java.awt.*;
 
 public class ContentDrawer {
     private int RECTANGLE_SIZE = 6;
-    private int MAZE_LENGHT;
+    private int MAZE_LENGHT = 99;
 
     private static final int CONTENT_PANE_WIDTH = 614; // 594+20
     private static final int CONTENT_PANE_HEIGHT = 714;// 10+594+10 + 80 <10+60+10>
@@ -16,9 +16,16 @@ public class ContentDrawer {
     private  JFrame frame;
     private MazePanel mazePanel;
     private JPanel jMazePanel;
+    private SetAntCountListener antCountListener;
+    private SetWallsCountListener wallsCountListener;
+    private int walls;
+    private int ants;
 
 
     public ContentDrawer(){
+        walls = 0;
+        ants = 0;
+
     }
 
     public void drawContent(){
@@ -72,14 +79,52 @@ public class ContentDrawer {
         JPanel horizontalPanel = new JPanel();
         horizontalPanel.setPreferredSize(new Dimension(MAZE_PANE_WIDTH/4,30));
         horizontalPanel.setLayout(new BoxLayout(horizontalPanel,BoxLayout.X_AXIS));
-        JTextField textField1 = new JTextField();
-        JButton button1 = new JButton("OK");
-        horizontalPanel.add(textField1);
-        horizontalPanel.add(button1);
+
+
+
         horizontalPanel.setBackground(backgroundColor);
 
+        switch (option){
+            case 0:
+                JTextField textField1 = new JTextField();
+                JButton button1 = new JButton("OK");
+                 button1.addActionListener(e -> {
+                     String stringValue = textField1.getText().trim();
+                     if(!stringValue.isEmpty()){
+                         if(ants != Integer.parseInt(stringValue)){
+                             ants = Integer.parseInt(stringValue);
+                             antCountListener.onAntCountChanged(ants);
+                         }
+
+                     }
+                 });
+
+                horizontalPanel.add(textField1);
+                horizontalPanel.add(button1);
+                break;
+
+            case 1:
+                JTextField textField2 = new JTextField();
+                JButton button2 = new JButton("OK");
+                button2.addActionListener(e -> {
+
+                    String stringValue = textField2.getText().trim();
+                    if(!stringValue.isEmpty()){
+                        if(walls != Integer.parseInt(stringValue)){
+                            walls = Integer.parseInt(stringValue);
+                            wallsCountListener.onWallsCountChanged(walls);
+                        }
+                    }
+                });
+
+                horizontalPanel.add(textField2);
+                horizontalPanel.add(button2);
+                break;
+        }
         return horizontalPanel;
     }
+
+
 
     private JPanel drawButtonsHorizontalPanel(){
         JPanel horizontalPanel = new JPanel();
@@ -106,5 +151,13 @@ public class ContentDrawer {
         jMazePanel.remove(mazePanel);
         jMazePanel.add(drawMazePanel(newMaze));
         frame.revalidate();
+    }
+
+    public SetAntCountListener getAntCountListener() {
+        return antCountListener;
+    }
+
+    public void setAntCountListener(SetAntCountListener antCountListener) {
+        this.antCountListener = antCountListener;
     }
 }
