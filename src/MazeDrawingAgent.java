@@ -12,14 +12,14 @@ import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 
-public class MazeDrawingAgent extends Agent implements SetAntCountListener {
+public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetWallsCountListener {
     private DFAgentDescription[] result;
-    private DFAgentDescription[] antsResult;
     private MazeField[][] maze;
-    private int antNumber = 0;
+    private int antNumber;
 
 
     public void setup() {
+        antNumber = 0;
         ContentDrawer drawer = new ContentDrawer();
         drawer.drawContent();
         drawer.setAntCountListener(this);
@@ -152,6 +152,7 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener {
 
     @Override
     public void onAntCountChanged(int count) {
+        DFAgentDescription[] antsResult;
 
         DFAgentDescription template = new DFAgentDescription();
         ServiceDescription ant = new ServiceDescription();
@@ -163,28 +164,30 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener {
         try {
             antsResult = DFService.search(this, template);
 
-
             ContainerController container = getContainerController();
             String agentName;
+
             if (antsResult.length > count) {
                 //unregister ants
-                for (int j = 0; j < (antsResult.length - count); j++) {
-                    agentName = antsResult[j].getName().getLocalName();
+                int antsToUnregister = antsResult.length - count;
+                for (int j = 0; j < antsToUnregister; j++) {
+                    agentName = antsResult[antsResult.length-1-j].getName().getLocalName();
                     AgentController agent = container.getAgent(agentName);
-                    System.out.println("Got agent " + agentName);
                     agent.kill();
                 }
-            } else if (antsResult.length < count) {
+            }
+
+            if (antsResult.length < count) {
                 //register new ants
-                for (int j = 0; j < (count - antsResult.length); j++) {
-                    agentName = "Ant" + antNumber;
-                    antNumber++;
+                int antsToRegister = count - antsResult.length;
+                for (int j = 0; j < antsToRegister; j++) {
+                    agentName = "Ant" + (antsResult.length+j);
+                    //antNumber++;
                     AgentController agentController;
                     agentController = container.createNewAgent(agentName, "AntAgent", null);
                     agentController.start();
                 }
             }
-
 
             //show found ants
             for (int i = 0; i < antsResult.length; i++) {
@@ -198,4 +201,8 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener {
     }
 
 
+    @Override
+    public void onWallsCountChanged(int walls) {
+        //TODO: WallAgent
+    }
 }

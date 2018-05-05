@@ -38,6 +38,13 @@ public class Command implements Serializable
                 return "ANT_NEIGHBORHOOD_INFORM";
             }
         },
+
+        ANT_DISABLED_INFORM{
+            @Override
+            public String toString() {
+                return "ANT_DISABLED_INFORM";
+            }
+        },
     }
 
     private CommandCode code;

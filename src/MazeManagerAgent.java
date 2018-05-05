@@ -153,6 +153,20 @@ public class MazeManagerAgent extends Agent{
                                 System.out.println(maze[newPosition.x][newPosition.y].getPheromonePower());
                                 System.out.println(Command.CommandCode.ANT_POSITION_INFORM.toString());
                                 break;
+
+                            case ANT_DISABLED_INFORM:
+                                AntPositionInformCommand positionInform = (AntPositionInformCommand) receivedMessage.getContentObject();
+                                Point oldPos = positionInform.getOldPosition();
+                                maze[oldPos.x][oldPos.y].setValue(MazeField.FieldCode.ALLEY);
+
+                                for(int i=0; i<2;i++){
+                                    for(int j=0;j<2;j++){
+                                        if(maze[oldPos.x+i][oldPos.y+j].getValue()==MazeField.FieldCode.ANT)maze[oldPos.x+i][oldPos.y+j].setValue(MazeField.FieldCode.ALLEY);
+                                    }
+                                }
+                                
+                                System.out.println(Command.CommandCode.ANT_DISABLED_INFORM.toString());
+                                break;
                         }
                     }
                     catch (Exception ex) {

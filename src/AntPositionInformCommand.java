@@ -19,6 +19,14 @@ public class AntPositionInformCommand extends Command
         this.distance = 1;
     }
 
+    public AntPositionInformCommand(int posX, int posY)
+    {
+        super(CommandCode.ANT_DISABLED_INFORM);
+        oldPosition = new Point();
+        this.oldPosition.x = posX;
+        this.oldPosition.y = posY;
+    }
+
     public Point getNewPosition()
     {
         return newPosition;

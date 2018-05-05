@@ -10,6 +10,8 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.lang.acl.MessageTemplate;
+
+import java.io.IOException;
 import java.util.Random;
 import java.util.Vector;
 import java.awt.Point;
@@ -163,6 +165,36 @@ public class AntAgent extends Agent {
 
     protected void takeDown() {
         //TODO Clear position with ant
+        DFAgentDescription template = new DFAgentDescription();
+        ServiceDescription sd = new ServiceDescription();
+        sd.setType("maze");
+        template.addServices(sd);
+
+        try {
+            result = DFService.search(AntAgent.this, template);
+
+            for (DFAgentDescription agent : result) {
+                ACLMessage message = MessageFactory.createInformativeMessage();
+                message.addReceiver(agent.getName());
+                try {
+                    AntPositionInformCommand positionInformCommand = new AntPositionInformCommand(getPreviousCoordinateX(),getPreviousCoordinateY());
+                    message.setContentObject(positionInformCommand);
+                    send(message);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+        } catch (FIPAException e) {
+            e.printStackTrace();
+        }
+
+        //deregister ant
+        try {
+            DFService.deregister(this);
+        } catch (FIPAException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean setNextMove(Vector<MazeField> maze){
