@@ -7,4 +7,11 @@ public class MessageFactory {
 
         return message;
     }
+
+    static ACLMessage createInformativeMessageMaze() {
+        ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+        message.setOntology("CHANGED_MAZE");
+
+        return message;
+    }
 }

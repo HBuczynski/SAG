@@ -45,6 +45,19 @@ public class Command implements Serializable
                 return "ANT_DISABLED_INFORM";
             }
         },
+        MAZE_CHANGED_UP_INFORM{
+            @Override
+            public String toString() {
+                return "MAZE_CHANGED_UP_INFORM";
+            }
+        },
+        MAZE_CHANGED_DOWN_INFORM{
+        @Override
+        public String toString() {
+            return "MAZE_CHANGED_DOWN_INFORM";
+        }
+    }
+
     }
 
     private CommandCode code;
