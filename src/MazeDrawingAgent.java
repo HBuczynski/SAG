@@ -2,38 +2,38 @@ import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
-import jade.domain.AMSService;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
-import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 
-public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetWallsCountListener {
+public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetWallsCountListener, SetMazeSizeListener{
     private DFAgentDescription[] result;
     private MazeField[][] maze;
-    private int antNumber;
+    private ContentDrawer drawer;
+    private DFAgentDescription mazeManagerTemplate;
 
 
     public void setup() {
-        antNumber = 0;
-        ContentDrawer drawer = new ContentDrawer();
+        drawer = new ContentDrawer();
         drawer.drawContent();
         drawer.setAntCountListener(this);
+        drawer.setWallsCountListener(this);
+        drawer.setMazeSizeListener(this);
+
+        mazeManagerTemplate = new DFAgentDescription();
+        ServiceDescription sd = new ServiceDescription();
+        sd.setType("maze");
+        mazeManagerTemplate.addServices(sd);
 
         addBehaviour(new TickerBehaviour(this, 200) {
             @Override
             protected void onTick() {
-                DFAgentDescription template = new DFAgentDescription();
-                ServiceDescription sd = new ServiceDescription();
-                sd.setType("maze");
-                template.addServices(sd);
-
                 try {
-                    result = DFService.search(MazeDrawingAgent.this, template);
+                    result = DFService.search(MazeDrawingAgent.this, mazeManagerTemplate);
 
                     Command mazeRequest = new Command(Command.CommandCode.MAZE_REQUEST);
 
@@ -61,7 +61,7 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
                         case MAZE_INFORM:
                             MazeInformCommand mazeGeneratorCmd = (MazeInformCommand) receivedMessage.getContentObject();
                             maze = mazeGeneratorCmd.getMazeValues();
-                            drawer.redrawMaze(maze);
+                            drawer.redrawMaze(maze,mazeGeneratorCmd.getRectDim());
                             System.out.println(Command.CommandCode.MAZE_INFORM.toString());
                     }
                 } catch (Exception ex) {
@@ -73,14 +73,8 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
         addBehaviour(new CyclicBehaviour() {
             @Override
             public void action() {
-
-                DFAgentDescription template = new DFAgentDescription();
-                ServiceDescription sd = new ServiceDescription();
-                sd.setType("maze");
-                template.addServices(sd);
-
                 try {
-                    result = DFService.search(MazeDrawingAgent.this, template);
+                    result = DFService.search(MazeDrawingAgent.this, mazeManagerTemplate);
 
                     Command mazeRequest = new Command(Command.CommandCode.MAZE_REQUEST);
 
@@ -108,7 +102,7 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
                         case MAZE_INFORM:
                             MazeInformCommand mazeGeneratorCmd = (MazeInformCommand) receivedMessage.getContentObject();
                             maze = mazeGeneratorCmd.getMazeValues();
-                            drawer.redrawMaze(maze);
+                            drawer.redrawMaze(maze,mazeGeneratorCmd.getRectDim());
                             System.out.println(Command.CommandCode.MAZE_INFORM.toString());
                     }
                 } catch (Exception ex) {
@@ -148,6 +142,7 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
     }
 
     protected void takeDown() {
+
     }
 
     @Override
@@ -182,7 +177,6 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
                 int antsToRegister = count - antsResult.length;
                 for (int j = 0; j < antsToRegister; j++) {
                     agentName = "Ant" + (antsResult.length+j);
-                    //antNumber++;
                     AgentController agentController;
                     agentController = container.createNewAgent(agentName, "AntAgent", null);
                     agentController.start();
@@ -200,9 +194,53 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
         }
     }
 
-
     @Override
     public void onWallsCountChanged(int walls) {
         //TODO: WallAgent
     }
+
+
+    @Override
+    public void onMazeSizeUp() {
+        try {
+            result = DFService.search(MazeDrawingAgent.this, mazeManagerTemplate);
+            for (DFAgentDescription agent : result) {
+                ACLMessage message = MessageFactory.createInformativeMessageMaze();
+                message.addReceiver(agent.getName());
+
+                MazeChangedInformCommand mazeChangedInformCommand = new MazeChangedInformCommand(Command.CommandCode.MAZE_CHANGED_UP_INFORM);
+                message.setContent(mazeChangedInformCommand.getCommandCode().toString());
+                send(message);
+                System.out.println(mazeChangedInformCommand.getCommandCode().toString());
+
+            }
+
+        } catch (FIPAException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void onMazeSizeDown() {
+        try {
+            result = DFService.search(MazeDrawingAgent.this, mazeManagerTemplate);
+            for (DFAgentDescription agent : result) {
+                ACLMessage message = MessageFactory.createInformativeMessageMaze();
+                message.addReceiver(agent.getName());
+
+                MazeChangedInformCommand mazeChangedInformCommand = new MazeChangedInformCommand(Command.CommandCode.MAZE_CHANGED_DOWN_INFORM);
+                message.setContent(mazeChangedInformCommand.getCommandCode().toString());
+                send(message);
+                System.out.println(mazeChangedInformCommand.getCommandCode().toString());
+            }
+        } catch (FIPAException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+
+
 }

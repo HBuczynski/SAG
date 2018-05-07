@@ -8,4 +8,11 @@ public class MessageTemplateFactory {
             MessageTemplate.MatchOntology("ANTS")
         );
     }
+
+    static MessageTemplate createInformTemplateMaze() {
+        return MessageTemplate.and(
+                MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+                MessageTemplate.MatchOntology("CHANGED_MAZE")
+        );
+    }
 }
