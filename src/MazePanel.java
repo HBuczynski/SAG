@@ -1,9 +1,17 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 public class MazePanel extends JPanel {
     private MazeField[][] maze;
     private int size;
+
+    private BufferedImage image;
 
     public MazePanel(MazeField[][] maze, int sizeValue) {
         this.maze = maze;
@@ -21,6 +29,7 @@ public class MazePanel extends JPanel {
                 switch (maze[i][j].getValue()) {
                     case WALL:
                         newColor = Color.BLACK;
+                        drawRect(g,newColor,i,j);
                         break;
 
                     case ALLEY:
@@ -33,28 +42,55 @@ public class MazePanel extends JPanel {
                             newColor = new Color(255, 100, 100);
                         else
                             newColor = new Color(255, 255, 255);
+
+                        drawRect(g,newColor,i,j);
                         break;
 
                     case EXIT:
                         newColor = Color.RED;
+                        drawRect(g,newColor,i,j);
                         break;
 
                     case MOBILE_WALL:
                         newColor = Color.YELLOW;
+                        drawRect(g,newColor,i,j);
                         break;
 
                     case ANT:
-                        newColor = Color.GREEN;
+                        drawIcon(g,i,j);
                         break;
 
                     default:
                         newColor = Color.YELLOW;
+                        drawRect(g,newColor,i,j);
                 }
-                g.setColor(newColor);
-                g.fillRect(size * j, size * i, size, size);
-                g.drawRect(size * j, size * i, size, size);
             }
         }
     }
 
+    private void drawRect(Graphics g, Color c, int i, int j){
+        g.setColor(c);
+        g.fillRect(size * j, size * i, size, size);
+        g.drawRect(size * j, size * i, size, size);
+    }
+
+    private void drawIcon(Graphics g, int i, int j){
+        BufferedImage ant;
+        try
+        {
+            ant = ImageIO.read(getClass().getResourceAsStream("resources/images/ant.png"));
+            Image scaledImage = ant.getScaledInstance(size, size, Image.SCALE_DEFAULT);
+            g.drawImage(scaledImage, size * j, size * i, this);
+        }
+
+        catch ( IOException exc )
+        {
+            exc.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+    }
 }

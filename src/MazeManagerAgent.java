@@ -19,8 +19,9 @@ import java.util.Random;
 public class MazeManagerAgent extends Agent {
 
     private int selection;
-    private int[] lenghts = {33, 45, 99, 197, 297};
-    private int[] rectDims = {18, 13, 6, 3, 2};
+
+    private int[] lenghts = {15, 33, 45, 55, 99, 165};
+    private int[] rectDims = {33,15,11,9,5,3};
     private MazeField[][] maze;
 
     private AID aid;
