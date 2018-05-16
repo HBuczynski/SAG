@@ -21,4 +21,11 @@ public class MessageFactory {
 
         return message;
     }
+
+    static ACLMessage createInformativeMessageAntExit() {
+        ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+        message.setOntology("MAZE_CHANGED_ANT_EXIT");
+
+        return message;
+    }
 }
