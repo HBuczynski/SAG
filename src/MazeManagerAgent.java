@@ -23,11 +23,13 @@ public class MazeManagerAgent extends Agent {
     private int[] lenghts = {15, 33, 45, 55, 99, 165};
     private int[] rectDims = {33,15,11,9,5,3};
     private MazeField[][] maze;
+    private Vector<MazeField> dynamicWalls;
 
     private AID aid;
 
     public void setup() {//TODO Adding ants dynamically
         aid = new AID();
+        dynamicWalls = new Vector<MazeField>();
 
         this.selection = 2;
 
@@ -57,14 +59,22 @@ public class MazeManagerAgent extends Agent {
         addBehaviour(new TickerBehaviour(this, 1000) {
             @Override
             protected void onTick() {
-                // TBD
-                // Update maze - moving walls
+
+                if(!dynamicWalls.isEmpty()) {
+                    for (MazeField field : dynamicWalls) {
+                        if (field.getValue() == MazeField.FieldCode.MOBILE_WALL) {
+                            field.setValue(MazeField.FieldCode.ALLEY);
+                        } else {
+                            field.setValue(MazeField.FieldCode.MOBILE_WALL);
+                        }
+                    }
+                }
             }
         });
 
-        addBehaviour(new TickerBehaviour(this, 200) {
+        addBehaviour(new CyclicBehaviour() {
             @Override
-            public void onTick() {
+            public void action() {
                 ACLMessage receivedMessage = receive(MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
 
                 if (receivedMessage != null) {
@@ -208,6 +218,63 @@ public class MazeManagerAgent extends Agent {
                 }
             }
         });
+
+        //Wall Changed
+        addBehaviour(new CyclicBehaviour() {
+            @Override
+            public void action() {
+                ACLMessage receivedMessage = receive(MessageTemplateFactory.createInformTemplateDynamicWalls());
+
+                try {
+                    if (receivedMessage != null) {
+                        Command cmd = (Command) receivedMessage.getContentObject();
+
+                        switch (cmd.getCommandCode()) {
+                            case DYNAMIC_WALLS_NUMBER_INFORM: {
+
+                                DynamicWallsInformCommand dynamicCommand = (DynamicWallsInformCommand) receivedMessage.getContentObject();
+                                int wallNumber = dynamicCommand.getWallsCount();
+
+                                if(dynamicWalls.size() < wallNumber)
+                                {
+                                    addDynamicWalls(wallNumber - dynamicWalls.size());
+                                }
+                                else
+                                {
+                                    while ((dynamicWalls.size() > wallNumber))
+                                    {
+                                        MazeField lastField = dynamicWalls.lastElement();
+                                        lastField.setValue(MazeField.FieldCode.ALLEY);
+                                        dynamicWalls.remove(lastField);
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void addDynamicWalls(int count)
+    {
+        while(count > 0)
+        {
+            Random rand = new Random();
+
+            int r = rand.nextInt(maze.length-2) + 1;
+            int c = rand.nextInt(maze.length-2) + 1;
+
+            if(maze[r][c].getValue() == MazeField.FieldCode.WALL) {
+
+                maze[r][c].setValue(MazeField.FieldCode.MOBILE_WALL);
+                dynamicWalls.add(maze[r][c]);
+                count--;
+            }
+        }
     }
 
     public void takeDown() {

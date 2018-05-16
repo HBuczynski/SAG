@@ -196,7 +196,27 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
 
     @Override
     public void onWallsCountChanged(int walls) {
-        //TODO: WallAgent
+        try {
+            result = DFService.search(MazeDrawingAgent.this, mazeManagerTemplate);
+            for (DFAgentDescription agent : result) {
+                ACLMessage message = MessageFactory.createInformativeMessageWalls();
+                message.addReceiver(agent.getName());
+
+                System.out.println("Wysylam scianki");
+
+                Command dynamicWallsInformCommand = new DynamicWallsInformCommand(walls);
+                try {
+                    message.setContentObject(dynamicWallsInformCommand);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+
+                send(message);
+                System.out.println(dynamicWallsInformCommand.getCommandCode().toString());
+            }
+        } catch (FIPAException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -239,8 +259,6 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
         }
 
     }
-
-
 
 
 }

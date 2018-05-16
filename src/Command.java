@@ -56,6 +56,11 @@ public class Command implements Serializable
         public String toString() {
             return "MAZE_CHANGED_DOWN_INFORM";
         }
+        },
+        DYNAMIC_WALLS_NUMBER_INFORM{
+        @Override
+        public String toString() { return "DYNAMIC_WALLS_NUMBER_INFORM";
+        }
     }
 
     }

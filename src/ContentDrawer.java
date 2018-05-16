@@ -47,7 +47,7 @@ public class ContentDrawer {
 
         JPanel contentPane = new JPanel();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
-        contentPane.setPreferredSize(new Dimension(CONTENT_PANE_WIDTH, CONTENT_PANE_HEIGHT));
+        contentPane.setPreferredSize(new Dimension(CONTENT_PANE_WIDTH+100, CONTENT_PANE_HEIGHT));
 
         jMazePanel.setBackground(backgroundColor);
 
@@ -61,6 +61,7 @@ public class ContentDrawer {
     private JPanel drawCustomOptions(){
         JPanel customOptionsPanel = new JPanel();
         customOptionsPanel.setPreferredSize(new Dimension(MAZE_PANE_DIM, 80));
+        customOptionsPanel.setMinimumSize(new Dimension(MAZE_PANE_DIM, 80));
 
         customOptionsPanel.add(new JLabel("Ilość mrówek"));
         customOptionsPanel.add(drawHorizontalPanel(0));
@@ -123,10 +124,15 @@ public class ContentDrawer {
         JPanel horizontalPanel = new JPanel();
         horizontalPanel.setBackground(backgroundColor);
         horizontalPanel.setPreferredSize(new Dimension(MAZE_PANE_DIM/2,30));
+        horizontalPanel.setMinimumSize(new Dimension(MAZE_PANE_DIM/2,30));
         horizontalPanel.setLayout(new BoxLayout(horizontalPanel,BoxLayout.X_AXIS));
         JButton button = new JButton("+");
+        button.setPreferredSize(new Dimension(30, 30));
+        button.setMinimumSize(new Dimension(30,30));
         button.addActionListener(e -> mazeSizeListener.onMazeSizeUp());
         JButton button1 = new JButton("-");
+        button1.setPreferredSize(new Dimension(30, 30));
+        button1.setMinimumSize(new Dimension(30,30));
         button1.addActionListener(e-> mazeSizeListener.onMazeSizeDown());
         horizontalPanel.add(button);
         horizontalPanel.add(button1);
@@ -138,6 +144,7 @@ public class ContentDrawer {
     private MazePanel drawMazePanel(MazeField[][] generatedMaze, int rectDim){
         mazePanel = new MazePanel(generatedMaze, rectDim);
         mazePanel.setPreferredSize(new Dimension(MAZE_PANE_DIM, MAZE_PANE_DIM));
+        mazePanel.setMinimumSize(new Dimension(MAZE_PANE_DIM, MAZE_PANE_DIM));
         mazePanel.setBackground(backgroundColor);
         return mazePanel;
     }

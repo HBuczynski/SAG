@@ -15,4 +15,11 @@ public class MessageTemplateFactory {
                 MessageTemplate.MatchOntology("CHANGED_MAZE")
         );
     }
+
+    static MessageTemplate createInformTemplateDynamicWalls(){
+        return MessageTemplate.and(
+                MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+                MessageTemplate.MatchOntology("DYNAMIC_WALLS_NUMBER")
+        );
+    }
 }

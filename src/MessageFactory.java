@@ -14,4 +14,11 @@ public class MessageFactory {
 
         return message;
     }
+
+    static ACLMessage createInformativeMessageWalls() {
+        ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+        message.setOntology("DYNAMIC_WALLS_NUMBER");
+
+        return message;
+    }
 }
