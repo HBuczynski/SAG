@@ -50,7 +50,7 @@ public class ContentDrawer {
 
         JPanel contentPane = new JPanel();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
-        contentPane.setPreferredSize(new Dimension(CONTENT_PANE_WIDTH+100, CONTENT_PANE_HEIGHT));
+        contentPane.setPreferredSize(new Dimension(CONTENT_PANE_WIDTH+100, CONTENT_PANE_HEIGHT+100));
 
         jMazePanel.setBackground(backgroundColor);
 
@@ -66,21 +66,33 @@ public class ContentDrawer {
         customOptionsPanel.setPreferredSize(new Dimension(MAZE_PANE_DIM, 80));
         customOptionsPanel.setMinimumSize(new Dimension(MAZE_PANE_DIM, 80));
 
-        customOptionsPanel.add(new JLabel("Ilość mrówek"));
-        customOptionsPanel.add(drawHorizontalPanel(0));
-        customOptionsPanel.add(new JLabel("Ilość ruchomych ścianek"));
-        customOptionsPanel.add(drawHorizontalPanel(1));
-        customOptionsPanel.add(new JLabel("Zmiana rozmiaru labiryntu"));
-        customOptionsPanel.add(drawButtonsHorizontalPanel());
-        customOptionsPanel.add(new JLabel("Wsp. wyparowania (0<wsp<1)"));
-        customOptionsPanel.add(drawHorizontalPanel(2));
+        Box horizontalBox = Box.createHorizontalBox();
+        horizontalBox.setAlignmentX(JPanel.LEFT_ALIGNMENT);
+        horizontalBox.add(new JLabel("Ilość mrówek"));
+        horizontalBox.add(drawHorizontalPanel(0));
+        customOptionsPanel.add(horizontalBox);
+        horizontalBox = Box.createHorizontalBox();
+        horizontalBox.setAlignmentX(JPanel.LEFT_ALIGNMENT);
+        horizontalBox.add(new JLabel("Ilość ruchomych ścianek"));
+        horizontalBox.add(drawHorizontalPanel(1));
+        customOptionsPanel.add(horizontalBox);
+        horizontalBox = Box.createHorizontalBox();
+        horizontalBox.setAlignmentX(JPanel.LEFT_ALIGNMENT);
+        horizontalBox.add(new JLabel("Zmiana rozmiaru labiryntu"));
+        horizontalBox.add(drawButtonsHorizontalPanel());
+        customOptionsPanel.add(horizontalBox);
+        horizontalBox = Box.createHorizontalBox();
+        horizontalBox.setAlignmentX(JPanel.LEFT_ALIGNMENT);
+        horizontalBox.add(new JLabel("Wsp. wyparowania (0<wsp<1)"));
+        horizontalBox.add(drawHorizontalPanel(2));
+        customOptionsPanel.add(horizontalBox);
         customOptionsPanel.setBackground(backgroundColor);
         return customOptionsPanel;
     }
 
     private JPanel drawHorizontalPanel(int option){
         JPanel horizontalPanel = new JPanel();
-        horizontalPanel.setPreferredSize(new Dimension(MAZE_PANE_DIM/4,30));
+        horizontalPanel.setPreferredSize(new Dimension(MAZE_PANE_DIM/2,30));
         horizontalPanel.setLayout(new BoxLayout(horizontalPanel,BoxLayout.X_AXIS));
 
         horizontalPanel.setBackground(backgroundColor);
@@ -146,8 +158,7 @@ public class ContentDrawer {
     private JPanel drawButtonsHorizontalPanel(){
         JPanel horizontalPanel = new JPanel();
         horizontalPanel.setBackground(backgroundColor);
-        horizontalPanel.setPreferredSize(new Dimension(MAZE_PANE_DIM/2,30));
-        horizontalPanel.setMinimumSize(new Dimension(MAZE_PANE_DIM/2,30));
+        horizontalPanel.setPreferredSize(new Dimension(MAZE_PANE_DIM/4,30));
         horizontalPanel.setLayout(new BoxLayout(horizontalPanel,BoxLayout.X_AXIS));
         JButton button = new JButton("+");
         button.setPreferredSize(new Dimension(30, 30));
