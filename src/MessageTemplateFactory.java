@@ -22,4 +22,11 @@ public class MessageTemplateFactory {
                 MessageTemplate.MatchOntology("DYNAMIC_WALLS_NUMBER")
         );
     }
+
+    static MessageTemplate createInformTemplateAntExit(){
+        return MessageTemplate.and(
+                MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+                MessageTemplate.MatchOntology("MAZE_CHANGED_ANT_EXIT")
+        );
+    }
 }

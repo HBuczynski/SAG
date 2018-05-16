@@ -26,6 +26,7 @@ public class MazeManagerAgent extends Agent {
     private Vector<MazeField> dynamicWalls;
 
     private AID aid;
+    private DFAgentDescription[] result;
 
     public void setup() {
         aid = new AID();
@@ -175,6 +176,24 @@ public class MazeManagerAgent extends Agent {
                                 AntPositionInformCommand positionInform = (AntPositionInformCommand) receivedMessage.getContentObject();
                                 Point oldPos = positionInform.getOldPosition();
                                 maze[oldPos.x][oldPos.y].setValue(MazeField.FieldCode.ALLEY);
+
+                                // Sending information to the MazeDrawingAgent
+                                try {
+                                    result = DFService.search(MazeManagerAgent.this, dfad);
+                                    for (DFAgentDescription agent : result) {
+                                        ACLMessage message = MessageFactory.createInformativeMessageAntExit();
+                                        message.addReceiver(agent.getName());
+
+                                        MazeChangedInformCommand mazeChangedInformCommand = new MazeChangedInformCommand(Command.CommandCode.MAZE_CHANGED_ANT_EXIT);
+                                        message.setContent(mazeChangedInformCommand.getCommandCode().toString());
+                                        send(message);
+                                        System.out.println(mazeChangedInformCommand.getCommandCode().toString());
+                                    }
+
+                                } catch (FIPAException e) {
+                                    e.printStackTrace();
+                                }
+
 //TODO What does it do?
 //                                for (int i = 0; i < 2; i++) {
 //                                    for (int j = 0; j < 2; j++) {

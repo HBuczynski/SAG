@@ -15,6 +15,7 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
     private MazeField[][] maze;
     private ContentDrawer drawer;
     private DFAgentDescription mazeManagerTemplate;
+    private int exitAntCounter;
 
 
     public void setup() {
@@ -108,6 +109,26 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
+                }
+            }
+        });
+
+        //Ant Exit
+        addBehaviour(new CyclicBehaviour() {
+            @Override
+            public void action() {
+                ACLMessage receivedMessage = receive(MessageTemplateFactory.createInformTemplateMaze());
+
+                if (receivedMessage != null) {
+                    String command = receivedMessage.getContent();
+
+                    switch (command) {
+                        case "MAZE_CHANGED_ANT_EXIT": {
+                            exitAntCounter++;
+                            break;
+                        }
+
+                    }
                 }
             }
         });
@@ -239,6 +260,4 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
         }
         System.out.println(MazeField.EVAPORATION_COEFF);
     }
-
-
 }
