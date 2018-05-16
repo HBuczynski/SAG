@@ -27,7 +27,7 @@ public class MazeManagerAgent extends Agent {
 
     private AID aid;
 
-    public void setup() {//TODO Adding ants dynamically
+    public void setup() {
         aid = new AID();
         dynamicWalls = new Vector<MazeField>();
 
@@ -169,13 +169,13 @@ public class MazeManagerAgent extends Agent {
                                 AntPositionInformCommand positionInform = (AntPositionInformCommand) receivedMessage.getContentObject();
                                 Point oldPos = positionInform.getOldPosition();
                                 maze[oldPos.x][oldPos.y].setValue(MazeField.FieldCode.ALLEY);
-
-                                for (int i = 0; i < 2; i++) {
-                                    for (int j = 0; j < 2; j++) {
-                                        if (maze[oldPos.x + i][oldPos.y + j].getValue() == MazeField.FieldCode.ANT)
-                                            maze[oldPos.x + i][oldPos.y + j].setValue(MazeField.FieldCode.ALLEY);
-                                    }
-                                }
+//TODO What does it do?
+//                                for (int i = 0; i < 2; i++) {
+//                                    for (int j = 0; j < 2; j++) {
+//                                        if (maze[oldPos.x + i][oldPos.y + j].getValue() == MazeField.FieldCode.ANT)
+//                                            maze[oldPos.x + i][oldPos.y + j].setValue(MazeField.FieldCode.ALLEY);
+//                                    }
+//                                }
 
                                 System.out.println(Command.CommandCode.ANT_DISABLED_INFORM.toString());
                                 break;
