@@ -2,7 +2,9 @@ import java.io.Serializable;
 
 public class MazeField implements Serializable {
 
-    public static final double EVAPORATION_COEFF = 0.1;
+    public static double EVAPORATION_COEFF = 0.1;
+    public static final double  MAX_PHEROMONE_POWER = 10.0;
+    public static final double  MIN_PHEROMONE_POWER = 0.5;
 
     public enum FieldCode {
         WALL, EXIT, MOBILE_WALL, ANT, ALLEY

@@ -16,13 +16,16 @@ public class ContentDrawer {
     private SetMazeSizeListener mazeSizeListener;
     private SetAntCountListener antCountListener;
     private SetWallsCountListener wallsCountListener;
+    private SetEvaporationCoeffListener evaporationCoeffListener;
     private int walls;
     private int ants;
+    private double coeff;
 
 
     public ContentDrawer(){
         walls = 0;
         ants = 0;
+        coeff = 0.9;
     }
 
     public void drawContent(){
@@ -69,6 +72,8 @@ public class ContentDrawer {
         customOptionsPanel.add(drawHorizontalPanel(1));
         customOptionsPanel.add(new JLabel("Zmiana rozmiaru labiryntu"));
         customOptionsPanel.add(drawButtonsHorizontalPanel());
+        customOptionsPanel.add(new JLabel("Wsp. wyparowania (0<wsp<1)"));
+        customOptionsPanel.add(drawHorizontalPanel(2));
         customOptionsPanel.setBackground(backgroundColor);
         return customOptionsPanel;
     }
@@ -115,6 +120,24 @@ public class ContentDrawer {
 
                 horizontalPanel.add(textField2);
                 horizontalPanel.add(button2);
+                break;
+
+            case 2:
+                JTextField textField3 = new JTextField();
+                JButton button3 = new JButton("OK");
+                button3.addActionListener(e -> {
+
+                    String stringValue = textField3.getText().trim();
+                    if(!stringValue.isEmpty()){
+                        if(coeff != Double.parseDouble(stringValue)){
+                            coeff = Double.parseDouble(stringValue);
+                            evaporationCoeffListener.onEvaporationCoeffChange(coeff);
+                        }
+                    }
+                });
+
+                horizontalPanel.add(textField3);
+                horizontalPanel.add(button3);
                 break;
         }
         return horizontalPanel;
@@ -177,5 +200,9 @@ public class ContentDrawer {
 
     public void setWallsCountListener(SetWallsCountListener wallsCountListener) {
         this.wallsCountListener = wallsCountListener;
+    }
+
+    public void setEvaporationCoeffListener(SetEvaporationCoeffListener evaporationCoeffListener) {
+        this.evaporationCoeffListener = evaporationCoeffListener;
     }
 }

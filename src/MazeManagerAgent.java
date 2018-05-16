@@ -49,22 +49,24 @@ public class MazeManagerAgent extends Agent {
             System.out.println(ex.getMessage());
         }
 
-        addBehaviour(new TickerBehaviour(this, 3000) {
+        addBehaviour(new TickerBehaviour(this, 1500) {
             @Override
             protected void onTick() {
                 updatePheromons();
             }
         });
 
-        addBehaviour(new TickerBehaviour(this, 1000) {
+        addBehaviour(new TickerBehaviour(this, 500) {
             @Override
             protected void onTick() {
 
                 if(!dynamicWalls.isEmpty()) {
                     for (MazeField field : dynamicWalls) {
-                        if (field.getValue() == MazeField.FieldCode.MOBILE_WALL) {
+                        Random random = new Random();
+                        int isWall = random.nextInt(10)%2;
+                        if (field.getValue() == MazeField.FieldCode.MOBILE_WALL && isWall == 1) {
                             field.setValue(MazeField.FieldCode.ALLEY);
-                        } else {
+                        } else if(field.getValue() == MazeField.FieldCode.ALLEY && isWall == 0) {
                             field.setValue(MazeField.FieldCode.MOBILE_WALL);
                         }
                     }
@@ -160,7 +162,11 @@ public class MazeManagerAgent extends Agent {
                                 int antDistance = positionInformCommand.getDistance();
                                 maze[oldPosition.x][oldPosition.y].setValue(MazeField.FieldCode.ALLEY);
                                 maze[newPosition.x][newPosition.y].setValue(MazeField.FieldCode.ANT);
-                                maze[newPosition.x][newPosition.y].setPheromonePower(maze[newPosition.x][newPosition.y].getPheromonePower() + Math.pow(1.0 / (double) antDistance, 0.25));
+                                double newPheromonePower = maze[newPosition.x][newPosition.y].getPheromonePower() + Math.pow(1.0 / (double) antDistance, 0.25);
+                                if(newPheromonePower > MazeField.MAX_PHEROMONE_POWER){
+                                    newPheromonePower = MazeField.MAX_PHEROMONE_POWER;
+                                }
+                                maze[newPosition.x][newPosition.y].setPheromonePower(newPheromonePower);
                                 System.out.println(maze[newPosition.x][newPosition.y].getPheromonePower());
                                 System.out.println(Command.CommandCode.ANT_POSITION_INFORM.toString());
                                 break;
@@ -426,10 +432,10 @@ public class MazeManagerAgent extends Agent {
     private void updatePheromons() {
         for (int i = 0; i < maze.length; ++i) {
             for (int j = 0; j < maze[0].length; ++j) {
-                if (maze[i][j].getValue() == MazeField.FieldCode.ANT || maze[i][j].getValue() == MazeField.FieldCode.ALLEY) { //TODO Make evaporation dependent on time not iterations:
+                if (maze[i][j].getValue() == MazeField.FieldCode.ANT || maze[i][j].getValue() == MazeField.FieldCode.ALLEY) {
                     maze[i][j].setPheromonePower(maze[i][j].getPheromonePower() * (1 - MazeField.EVAPORATION_COEFF));
-                    if (maze[i][j].getPheromonePower() < 0.5) {
-                        maze[i][j].setPheromonePower(0.5);
+                    if (maze[i][j].getPheromonePower() < MazeField.MIN_PHEROMONE_POWER) {
+                        maze[i][j].setPheromonePower(MazeField.MIN_PHEROMONE_POWER);
                     }
                 }
             }

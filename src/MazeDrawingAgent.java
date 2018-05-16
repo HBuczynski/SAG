@@ -10,7 +10,7 @@ import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 
-public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetWallsCountListener, SetMazeSizeListener{
+public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetWallsCountListener, SetMazeSizeListener, SetEvaporationCoeffListener{
     private DFAgentDescription[] result;
     private MazeField[][] maze;
     private ContentDrawer drawer;
@@ -22,6 +22,7 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
         drawer.drawContent();
         drawer.setAntCountListener(this);
         drawer.setWallsCountListener(this);
+        drawer.setEvaporationCoeffListener(this);
         drawer.setMazeSizeListener(this);
 
         mazeManagerTemplate = new DFAgentDescription();
@@ -229,6 +230,14 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    public void onEvaporationCoeffChange(double coeff) {
+        if(coeff > 0.0 && coeff < 1.0) {
+            MazeField.EVAPORATION_COEFF = coeff;
+        }
+        System.out.println(MazeField.EVAPORATION_COEFF);
     }
 
 

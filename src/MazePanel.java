@@ -34,15 +34,8 @@ public class MazePanel extends JPanel {
 
                     case ALLEY:
                         double pheromone = maze[i][j].getPheromonePower();
-                        if (pheromone > 0.75)
-                            newColor = new Color(255, 200, 200);
-                        else if (pheromone > 1.0)
-                            newColor = new Color(255, 160, 160);
-                        else if (pheromone > 1.2)
-                            newColor = new Color(255, 100, 100);
-                        else
-                            newColor = new Color(255, 255, 255);
-
+                        int coeff = (int)(255*(1-pheromone/MazeField.MAX_PHEROMONE_POWER));
+                        newColor = new Color(255, coeff, coeff);
                         drawRect(g,newColor,i,j);
                         break;
 
