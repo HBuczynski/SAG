@@ -177,7 +177,7 @@ public class AntAgent extends Agent {
                 ACLMessage message = MessageFactory.createInformativeMessage();
                 message.addReceiver(agent.getName());
                 try {
-                    AntPositionInformCommand positionInformCommand = new AntPositionInformCommand(getPreviousCoordinateX(),getPreviousCoordinateY());
+                    AntPositionInformCommand positionInformCommand = new AntPositionInformCommand(getCoordinateX(),getCoordinateY());
                     message.setContentObject(positionInformCommand);
                     send(message);
                 } catch (Exception ex) {
@@ -200,7 +200,6 @@ public class AntAgent extends Agent {
     public boolean setNextMove(Vector<MazeField> maze){
         for(int i = 0; i < maze.size(); ++i){
             if(maze.get(i).getValue() == MazeField.FieldCode.EXIT){
-                makeMove(maze.get(i));
                 return true;
             }
         }
@@ -236,11 +235,6 @@ public class AntAgent extends Agent {
     }
 
     public void makeMove(MazeField field){
-        System.out.println("X: " + field.getCoordinateX() + " Y: " + field.getCoordinateY());
-        if(field.getCoordinateX() == 0 || field.getCoordinateY() == 0){
-            System.out.println("ERROR!");
-           return;
-        }
         setCoordinateY(field.getCoordinateY());
         setCoordinateX(field.getCoordinateX());
         ++distance;

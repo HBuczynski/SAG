@@ -117,20 +117,12 @@ public class MazeManagerAgent extends Agent {
                                         if (maze[antPosition.x + i][antPosition.y].getValue() != MazeField.FieldCode.WALL &&
                                                 maze[antPosition.x + i][antPosition.y].getValue() != MazeField.FieldCode.MOBILE_WALL) {
                                             neighbourhood.add(maze[antPosition.x + i][antPosition.y]);
-                                            if(maze[antPosition.x + i][antPosition.y].getCoordinateX() == 0 || maze[antPosition.x + i][antPosition.y].getCoordinateY() == 0){
-                                                System.out.println("ERROR!");
-                                                return;
-                                            }
                                         }
 
                                     if (antPosition.y + i > 0 && antPosition.y + i < maze.length)
                                         if (maze[antPosition.x][antPosition.y + i].getValue() != MazeField.FieldCode.WALL &&
                                                 maze[antPosition.x][antPosition.y + i].getValue() != MazeField.FieldCode.MOBILE_WALL) {
                                             neighbourhood.add(maze[antPosition.x][antPosition.y + i]);
-                                            if (maze[antPosition.x][antPosition.y + i].getCoordinateX() == 0 || maze[antPosition.x][antPosition.y + i].getCoordinateY() == 0) {
-                                                System.out.println("ERROR!");
-                                                return;
-                                            }
                                         }
 
                                 }

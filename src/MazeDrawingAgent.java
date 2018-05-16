@@ -168,6 +168,7 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
                 for (int j = 0; j < antsToUnregister; j++) {
                     agentName = antsResult[antsResult.length-1-j].getName().getLocalName();
                     AgentController agent = container.getAgent(agentName);
+
                     agent.kill();
                 }
             }
