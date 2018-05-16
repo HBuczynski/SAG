@@ -52,7 +52,7 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
-                        System.out.println(Command.CommandCode.MAZE_REQUEST.toString());
+                        //System.out.println(Command.CommandCode.MAZE_REQUEST.toString());
                         send(message);
                     }
                 } catch (FIPAException e) {
@@ -68,7 +68,7 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
                             MazeInformCommand mazeGeneratorCmd = (MazeInformCommand) receivedMessage.getContentObject();
                             maze = mazeGeneratorCmd.getMazeValues();
                             drawer.redrawMaze(maze,mazeGeneratorCmd.getRectDim());
-                            System.out.println(Command.CommandCode.MAZE_INFORM.toString());
+                            //System.out.println(Command.CommandCode.MAZE_INFORM.toString());
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -93,7 +93,7 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
-                        System.out.println(Command.CommandCode.MAZE_REQUEST.toString());
+                        //System.out.println(Command.CommandCode.MAZE_REQUEST.toString());
                         send(message);
                     }
                 } catch (FIPAException e) {
@@ -109,7 +109,7 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
                             MazeInformCommand mazeGeneratorCmd = (MazeInformCommand) receivedMessage.getContentObject();
                             maze = mazeGeneratorCmd.getMazeValues();
                             drawer.redrawMaze(maze,mazeGeneratorCmd.getRectDim());
-                            System.out.println(Command.CommandCode.MAZE_INFORM.toString());
+                            //System.out.println(Command.CommandCode.MAZE_INFORM.toString());
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();

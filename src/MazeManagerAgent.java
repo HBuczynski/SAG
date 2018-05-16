@@ -99,7 +99,7 @@ public class MazeManagerAgent extends Agent {
                                     ex.printStackTrace();
                                 }
 
-                                System.out.println(Command.CommandCode.MAZE_REQUEST.toString());
+                                //System.out.println(Command.CommandCode.MAZE_REQUEST.toString());
                                 send(message);
                                 break;
 
@@ -130,7 +130,7 @@ public class MazeManagerAgent extends Agent {
                                     ex.printStackTrace();
                                 }
 
-                                System.out.println(Command.CommandCode.ANT_NEIGHBORHOOD_REQUEST.toString());
+                                //System.out.println(Command.CommandCode.ANT_NEIGHBORHOOD_REQUEST.toString());
                                 send(message);
 
                                 break;
@@ -168,8 +168,8 @@ public class MazeManagerAgent extends Agent {
                                     newPheromonePower = MazeField.MAX_PHEROMONE_POWER;
                                 }
                                 maze[newPosition.x][newPosition.y].setPheromonePower(newPheromonePower);
-                                System.out.println(maze[newPosition.x][newPosition.y].getPheromonePower());
-                                System.out.println(Command.CommandCode.ANT_POSITION_INFORM.toString());
+                                //System.out.println(maze[newPosition.x][newPosition.y].getPheromonePower());
+                                //System.out.println(Command.CommandCode.ANT_POSITION_INFORM.toString());
                                 break;
 
                             case ANT_DISABLED_INFORM:
@@ -187,7 +187,7 @@ public class MazeManagerAgent extends Agent {
                                         MazeChangedInformCommand mazeChangedInformCommand = new MazeChangedInformCommand(Command.CommandCode.MAZE_CHANGED_ANT_EXIT);
                                         message.setContent(mazeChangedInformCommand.getCommandCode().toString());
                                         send(message);
-                                        System.out.println(mazeChangedInformCommand.getCommandCode().toString());
+                                        //System.out.println(mazeChangedInformCommand.getCommandCode().toString());
                                     }
 
                                 } catch (FIPAException e) {

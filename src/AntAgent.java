@@ -89,7 +89,7 @@ public class AntAgent extends Agent {
                 setCoordinateX(1);
                 setCoordinateY(1);
                 setDistance(1);
-                System.out.println("Ant placed");
+                //System.out.println("Ant placed");
             }
         });
 
@@ -117,7 +117,7 @@ public class AntAgent extends Agent {
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
-                        System.out.println(Command.CommandCode.ANT_NEIGHBORHOOD_REQUEST.toString());
+                        //System.out.println(Command.CommandCode.ANT_NEIGHBORHOOD_REQUEST.toString());
                         send(message);
                     }
                 } catch (FIPAException e) {
@@ -153,7 +153,7 @@ public class AntAgent extends Agent {
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                             }
-                            System.out.println(Command.CommandCode.ANT_POSITION_INFORM.toString());
+                           // System.out.println(Command.CommandCode.ANT_POSITION_INFORM.toString());
                             send(message);
                             break;
                     }
@@ -165,7 +165,6 @@ public class AntAgent extends Agent {
     }
 
     protected void takeDown() {
-        //TODO Clear position with ant
         DFAgentDescription template = new DFAgentDescription();
         ServiceDescription sd = new ServiceDescription();
         sd.setType("maze");
@@ -237,6 +236,11 @@ public class AntAgent extends Agent {
     }
 
     public void makeMove(MazeField field){
+        System.out.println("X: " + field.getCoordinateX() + " Y: " + field.getCoordinateY());
+        if(field.getCoordinateX() == 0 || field.getCoordinateY() == 0){
+            System.out.println("ERROR!");
+           return;
+        }
         setCoordinateY(field.getCoordinateY());
         setCoordinateX(field.getCoordinateX());
         ++distance;
