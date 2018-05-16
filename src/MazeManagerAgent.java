@@ -9,6 +9,7 @@ import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
+import javax.swing.*;
 import java.util.Vector;
 
 import java.awt.*;
@@ -16,13 +17,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
-public class MazeManagerAgent extends Agent {
+public class MazeManagerAgent extends Agent{
 
     private int selection;
 
     private int[] lenghts = {15, 33, 45, 55, 99, 165};
     private int[] rectDims = {33,15,11,9,5,3};
     private MazeField[][] maze;
+
     private Vector<MazeField> dynamicWalls;
 
     private AID aid;
@@ -30,7 +32,7 @@ public class MazeManagerAgent extends Agent {
 
     public void setup() {
         aid = new AID();
-        dynamicWalls = new Vector<MazeField>();
+        dynamicWalls = new Vector<>();
 
         this.selection = 2;
 
@@ -197,13 +199,14 @@ public class MazeManagerAgent extends Agent {
                                     e.printStackTrace();
                                 }
 
-//TODO What does it do?
-//                                for (int i = 0; i < 2; i++) {
-//                                    for (int j = 0; j < 2; j++) {
-//                                        if (maze[oldPos.x + i][oldPos.y + j].getValue() == MazeField.FieldCode.ANT)
-//                                            maze[oldPos.x + i][oldPos.y + j].setValue(MazeField.FieldCode.ALLEY);
-//                                    }
-//                                }
+                                //  clears removed Ant position
+                                // 'cos sometimes MazeManagerAgent receives a message with an information of removed ant old position
+                                for (int i = 0; i < 2; i++) {
+                                    for (int j = 0; j < 2; j++) {
+                                        if (maze[oldPos.x + i][oldPos.y + j].getValue() == MazeField.FieldCode.ANT)
+                                            maze[oldPos.x + i][oldPos.y + j].setValue(MazeField.FieldCode.ALLEY);
+                                    }
+                                }
 
                                 System.out.println(Command.CommandCode.ANT_DISABLED_INFORM.toString());
                                 break;
@@ -255,12 +258,21 @@ public class MazeManagerAgent extends Agent {
 
                 try {
                     if (receivedMessage != null) {
-                        Command cmd = (Command) receivedMessage.getContentObject();
 
+                        Command cmd = (Command) receivedMessage.getContentObject();
                         switch (cmd.getCommandCode()) {
                             case DYNAMIC_WALLS_NUMBER_INFORM: {
 
                                 DynamicWallsInformCommand dynamicCommand = (DynamicWallsInformCommand) receivedMessage.getContentObject();
+
+                                //////send info with current dynamicWalls size
+                                ACLMessage message = MessageFactory.createInformativeMessageWallsValue();
+                                message.addReceiver(receivedMessage.getSender());
+                                Command currentWallsInformCommand = new CurrentWallsInformCommand(dynamicWalls.size());
+                                message.setContentObject(currentWallsInformCommand);
+                                send(message);
+                                ////
+
                                 int wallNumber = dynamicCommand.getWallsCount();
 
                                 if(dynamicWalls.size() < wallNumber)

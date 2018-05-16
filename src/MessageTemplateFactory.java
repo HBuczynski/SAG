@@ -29,4 +29,11 @@ public class MessageTemplateFactory {
                 MessageTemplate.MatchOntology("MAZE_CHANGED_ANT_EXIT")
         );
     }
+
+    static MessageTemplate createInformTemplateWallsValue(){
+        return MessageTemplate.and(
+                MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+                MessageTemplate.MatchOntology("LAST_WALLS_VALUE")
+        );
+    }
 }

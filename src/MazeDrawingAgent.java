@@ -7,8 +7,11 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.UnreadableException;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
+
+import javax.swing.*;
 
 public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetWallsCountListener, SetMazeSizeListener, SetEvaporationCoeffListener{
     private DFAgentDescription[] result;
@@ -18,6 +21,10 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
     private int exitAntCounter;
     private int otherAnts;
 
+    private int walls;
+    private JLabel countedAndOut;
+    private JLabel countedAndExists;
+
 
     public void setup() {
         drawer = new ContentDrawer();
@@ -26,6 +33,7 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
         drawer.setWallsCountListener(this);
         drawer.setEvaporationCoeffListener(this);
         drawer.setMazeSizeListener(this);
+
 
         exitAntCounter = 0;
         otherAnts = 0;
@@ -117,11 +125,69 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
             }
         });
 
+        //set labels with an informations about added / removed walls
+        addBehaviour(new CyclicBehaviour() {
+            @Override
+            public void action() {
+
+                ACLMessage receivedMessage = receive(MessageTemplateFactory.createInformTemplateWallsValue());
+
+                try{
+                    if (receivedMessage != null) {
+                        Command cmd = (Command) receivedMessage.getContentObject();
+                        switch (cmd.getCommandCode()) {
+                            case CURRENT_WALLS_INFORM: {
+                                CurrentWallsInformCommand command = (CurrentWallsInformCommand) receivedMessage.getContentObject();
+
+                                int currentWallsValue = command.getWallsCount();
+                                int diff;
+                                if(walls>currentWallsValue){
+                                    diff = walls-currentWallsValue;
+                                    countedAndOut.setText("Dodano " +diff+ " ruchomych ścianek.");
+                                    countedAndExists.setText("W labiryncie jest " + walls + " ruchomych ścianek.");
+                                } else if (walls<currentWallsValue){
+                                    diff = currentWallsValue - walls;
+                                    countedAndOut.setText("Usunięto " +diff+ " ruchomych ścianek.");
+                                    countedAndExists.setText("W labiryncie jest " + walls + " ruchomych ścianek.");
+                                } else {
+                                    countedAndExists.setText("");
+                                    countedAndOut.setText("");
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }catch  (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
         //Ant Exit
         addBehaviour(new CyclicBehaviour() {
             @Override
             public void action() {
                 ACLMessage receivedMessage = receive(MessageTemplateFactory.createInformTemplateMaze());
+
+                if (receivedMessage != null) {
+                    String command = receivedMessage.getContent();
+
+                    switch (command) {
+                        case "MAZE_CHANGED_ANT_EXIT": {
+                            exitAntCounter++;
+                            otherAnts--;
+                            break;
+                        }
+
+                    }
+                }
+            }
+        });
+
+        addBehaviour(new CyclicBehaviour() {
+            @Override
+            public void action() {
+                ACLMessage receivedMessage = receive();
 
                 if (receivedMessage != null) {
                     String command = receivedMessage.getContent();
@@ -144,7 +210,7 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
     }
 
     @Override
-    public void onAntCountChanged(int count) {
+    public void onAntCountChanged(int count, JLabel countedAndOut, JLabel countedAndExists) {
         DFAgentDescription[] antsResult;
 
         DFAgentDescription template = new DFAgentDescription();
@@ -164,6 +230,12 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
 
             if (antsResult.length > count) {
                 //unregister ants
+                otherAnts = count;
+                countedAndExists.setText("W labiryncie jest " + otherAnts + " mrówek.");
+
+                exitAntCounter = antsResult.length - count;
+                countedAndOut.setText("Usunięto " + exitAntCounter + " mrówek.");
+
                 int antsToUnregister = antsResult.length - count;
                 for (int j = 0; j < antsToUnregister; j++) {
                     agentName = antsResult[antsResult.length-1-j].getName().getLocalName();
@@ -175,6 +247,11 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
 
             if (antsResult.length < count) {
                 //register new ants
+                otherAnts = count;
+                countedAndExists.setText("W labiryncie jest " + otherAnts + " mrówek.");
+                exitAntCounter = count-antsResult.length;
+                countedAndOut.setText("Dodano " + exitAntCounter + " mrówek.");
+
                 int antsToRegister = count - antsResult.length;
                 for (int j = 0; j < antsToRegister; j++) {
                     agentName = "Ant" + (antsResult.length+j);
@@ -184,22 +261,21 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
                 }
             }
 
-            //show found ants
-            for (int i = 0; i < antsResult.length; i++) {
-                AID agentID = antsResult[i].getName();
-                System.out.println("FOUND ANT" + " onAntCountChanged: " + agentID + " " + antsResult.length);
-                System.out.println(agentID.getLocalName());
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void onWallsCountChanged(int walls) {
+    public void onWallsCountChanged(int walls, JLabel countedAndOut, JLabel countedAndExists) {
+        this.walls = walls;
+        this.countedAndExists = countedAndExists;
+        this.countedAndOut = countedAndOut;
+
         try {
             result = DFService.search(MazeDrawingAgent.this, mazeManagerTemplate);
             for (DFAgentDescription agent : result) {
+
                 ACLMessage message = MessageFactory.createInformativeMessageWalls();
                 message.addReceiver(agent.getName());
 
@@ -218,8 +294,9 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
         } catch (FIPAException e) {
             e.printStackTrace();
         }
-    }
 
+
+    }
 
     @Override
     public void onMazeSizeUp() {

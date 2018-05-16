@@ -28,4 +28,12 @@ public class MessageFactory {
 
         return message;
     }
+
+    static ACLMessage createInformativeMessageWallsValue(){
+
+        ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+        message.setOntology("LAST_WALLS_VALUE");
+
+        return message;
+    }
 }

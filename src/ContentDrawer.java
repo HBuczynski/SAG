@@ -4,7 +4,7 @@ import java.awt.*;
 public class ContentDrawer {
 
     private static final int CONTENT_PANE_WIDTH = 515; // 495+20
-    private static final int CONTENT_PANE_HEIGHT = 595;// 10+495+10 + 80 <10+60+10>
+    private static final int CONTENT_PANE_HEIGHT = 745;// 10+495+200+10  <10+180+10>
 
     private static final int MAZE_PANE_DIM = 495;
 
@@ -20,12 +20,15 @@ public class ContentDrawer {
     private int walls;
     private int ants;
     private double coeff;
+    private JLabel countedAndExists, countedAndOut;
 
 
     public ContentDrawer(){
         walls = 0;
         ants = 0;
         coeff = 0.9;
+        countedAndExists = new JLabel(" ");
+        countedAndOut = new JLabel(" ");
     }
 
     public void drawContent(){
@@ -50,7 +53,7 @@ public class ContentDrawer {
 
         JPanel contentPane = new JPanel();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
-        contentPane.setPreferredSize(new Dimension(CONTENT_PANE_WIDTH+100, CONTENT_PANE_HEIGHT+100));
+        contentPane.setPreferredSize(new Dimension(CONTENT_PANE_WIDTH, CONTENT_PANE_HEIGHT));
 
         jMazePanel.setBackground(backgroundColor);
 
@@ -63,37 +66,53 @@ public class ContentDrawer {
 
     private JPanel drawCustomOptions(){
         JPanel customOptionsPanel = new JPanel();
-        customOptionsPanel.setPreferredSize(new Dimension(MAZE_PANE_DIM, 80));
-        customOptionsPanel.setMinimumSize(new Dimension(MAZE_PANE_DIM, 80));
+        customOptionsPanel.setPreferredSize(new Dimension(MAZE_PANE_DIM, 180));
+        customOptionsPanel.setMinimumSize(new Dimension(MAZE_PANE_DIM, 180));
+       // customOptionsPanel.setLayout(new BoxLayout(customOptionsPanel,BoxLayout.Y_AXIS));
+        customOptionsPanel.setBackground(backgroundColor);
+
+        Box verticalBox = Box.createVerticalBox();
 
         Box horizontalBox = Box.createHorizontalBox();
-        horizontalBox.setAlignmentX(JPanel.LEFT_ALIGNMENT);
-        horizontalBox.add(new JLabel("Ilość mrówek"));
+        horizontalBox.setPreferredSize(new Dimension(MAZE_PANE_DIM/2,30));
+
+        //ilosc mrowek + okienko i przycisk
+        JLabel label1 = new JLabel("Ilość mrówek");
+        label1.setMaximumSize(new Dimension(220,30));
+        horizontalBox.add(label1);
         horizontalBox.add(drawHorizontalPanel(0));
-        customOptionsPanel.add(horizontalBox);
+        verticalBox.add(horizontalBox);
+
+        //ilosc ruchomych scianek + okienko i przycisk
         horizontalBox = Box.createHorizontalBox();
-        horizontalBox.setAlignmentX(JPanel.LEFT_ALIGNMENT);
-        horizontalBox.add(new JLabel("Ilość ruchomych ścianek"));
+        JLabel label2 = new JLabel("Ilość ruchomych ścianek");
+        label2.setMaximumSize(new Dimension(220,30));
+        horizontalBox.add(label2);
         horizontalBox.add(drawHorizontalPanel(1));
-        customOptionsPanel.add(horizontalBox);
-        horizontalBox = Box.createHorizontalBox();
-        horizontalBox.setAlignmentX(JPanel.LEFT_ALIGNMENT);
-        horizontalBox.add(new JLabel("Zmiana rozmiaru labiryntu"));
-        horizontalBox.add(drawButtonsHorizontalPanel());
-        customOptionsPanel.add(horizontalBox);
-        horizontalBox = Box.createHorizontalBox();
-        horizontalBox.setAlignmentX(JPanel.LEFT_ALIGNMENT);
-        horizontalBox.add(new JLabel("Wsp. wyparowania (0<wsp<1)"));
-        horizontalBox.add(drawHorizontalPanel(2));
-        customOptionsPanel.add(horizontalBox);
+        verticalBox.add(horizontalBox);
+
+        //wpolczynnik wyparowania
+        verticalBox.add(new JLabel("Współczynnik wyparowania (0<wsp<1)"));
+        verticalBox.add(drawHorizontalPanel(2));
+
+        //zmiana rozmiaru lab
+        verticalBox.add(new JLabel("Zmiana rozmiaru labiryntu"));
+        verticalBox.add(drawMazeSizeButtonsPanel());
+
+        //Mrowki pozostale
+        verticalBox.add(countedAndExists);
+
+        //Mrowki opuszajace labirynt
+        verticalBox.add(countedAndOut);
+
         customOptionsPanel.setBackground(backgroundColor);
+        customOptionsPanel.add(verticalBox);
         return customOptionsPanel;
     }
 
-    private JPanel drawHorizontalPanel(int option){
-        JPanel horizontalPanel = new JPanel();
-        horizontalPanel.setPreferredSize(new Dimension(MAZE_PANE_DIM/2,30));
-        horizontalPanel.setLayout(new BoxLayout(horizontalPanel,BoxLayout.X_AXIS));
+    private Box drawHorizontalPanel(int option){
+        Box horizontalPanel = Box.createHorizontalBox();
+        horizontalPanel.setPreferredSize(new Dimension(MAZE_PANE_DIM/4,30));
 
         horizontalPanel.setBackground(backgroundColor);
 
@@ -105,13 +124,15 @@ public class ContentDrawer {
                      String stringValue = textField1.getText().trim();
                      if(!stringValue.isEmpty()){
                              ants = Integer.parseInt(stringValue);
-                             antCountListener.onAntCountChanged(ants);
+                             antCountListener.onAntCountChanged(ants,countedAndOut,countedAndExists);
 
                      }
+                     textField1.setText("");
                  });
 
-                horizontalPanel.add(textField1);
-                horizontalPanel.add(button1);
+                 textField1.setMaximumSize(new Dimension(50,30));
+                 horizontalPanel.add(textField1);
+                 horizontalPanel.add(button1);
                 break;
 
             case 1:
@@ -123,11 +144,14 @@ public class ContentDrawer {
                     if(!stringValue.isEmpty()){
                         if(walls != Integer.parseInt(stringValue)){
                             walls = Integer.parseInt(stringValue);
-                            wallsCountListener.onWallsCountChanged(walls);
+                            wallsCountListener.onWallsCountChanged(walls,countedAndOut,countedAndExists);
                         }
+                        textField2.setText("");
                     }
                 });
 
+
+                textField2.setMaximumSize(new Dimension(50,30));
                 horizontalPanel.add(textField2);
                 horizontalPanel.add(button2);
                 break;
@@ -146,6 +170,11 @@ public class ContentDrawer {
                     }
                 });
 
+                JLabel emptyLabel = new JLabel(" ");
+                emptyLabel.setMaximumSize(new Dimension(90,1));
+                textField3.setMaximumSize(new Dimension(100,30));
+                button3.setPreferredSize(new Dimension(80,30));
+                horizontalPanel.add(emptyLabel);
                 horizontalPanel.add(textField3);
                 horizontalPanel.add(button3);
                 break;
@@ -153,25 +182,25 @@ public class ContentDrawer {
         return horizontalPanel;
     }
 
-    private JPanel drawButtonsHorizontalPanel(){
-        JPanel horizontalPanel = new JPanel();
-        horizontalPanel.setBackground(backgroundColor);
-        horizontalPanel.setPreferredSize(new Dimension(MAZE_PANE_DIM/4,30));
-        horizontalPanel.setLayout(new BoxLayout(horizontalPanel,BoxLayout.X_AXIS));
+
+    private Box drawMazeSizeButtonsPanel(){
+        Box panel = Box.createHorizontalBox();
+        panel.setBackground(backgroundColor);
+        panel.setPreferredSize(new Dimension(MAZE_PANE_DIM/2,30));
+
         JButton button = new JButton("+");
         button.setPreferredSize(new Dimension(30, 30));
-        button.setMinimumSize(new Dimension(30,30));
         button.addActionListener(e -> mazeSizeListener.onMazeSizeUp());
+
         JButton button1 = new JButton("-");
         button1.setPreferredSize(new Dimension(30, 30));
-        button1.setMinimumSize(new Dimension(30,30));
         button1.addActionListener(e-> mazeSizeListener.onMazeSizeDown());
-        horizontalPanel.add(button);
-        horizontalPanel.add(button1);
 
-        return horizontalPanel;
+        panel.add(button);
+        panel.add(button1);
+
+        return panel;
     }
-
 
     private MazePanel drawMazePanel(MazeField[][] generatedMaze, int rectDim){
         mazePanel = new MazePanel(generatedMaze, rectDim);

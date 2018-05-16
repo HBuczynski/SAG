@@ -63,9 +63,16 @@ public class Command implements Serializable
         },
         DYNAMIC_WALLS_NUMBER_INFORM{
         @Override
-        public String toString() { return "DYNAMIC_WALLS_NUMBER_INFORM";
+        public String toString() {
+            return "DYNAMIC_WALLS_NUMBER_INFORM";
+            }
+        },
+        CURRENT_WALLS_INFORM{
+            @Override
+            public String toString() {
+                return "CURRENT_WALLS_INFORM";
+            }
         }
-    }
 
     }
 

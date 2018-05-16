@@ -50,7 +50,9 @@ public class MazePanel extends JPanel {
                         break;
 
                     case ANT:
-                        drawIcon(g,i,j);
+                        //drawIcon(g,i,j);
+                        newColor = new Color(102, 0, 0);
+                        drawCirc(g,newColor,i,j);
                         break;
 
                     default:
@@ -67,20 +69,12 @@ public class MazePanel extends JPanel {
         g.drawRect(size * j, size * i, size, size);
     }
 
-    private void drawIcon(Graphics g, int i, int j){
-        BufferedImage ant;
-        try
-        {
-            ant = ImageIO.read(getClass().getResourceAsStream("resources/images/ant.png"));
-            Image scaledImage = ant.getScaledInstance(size, size, Image.SCALE_DEFAULT);
-            g.drawImage(scaledImage, size * j, size * i, this);
-        }
-
-        catch ( IOException exc )
-        {
-            exc.printStackTrace();
-        }
+    private void drawCirc(Graphics g, Color c, int i, int j){
+        g.setColor(c);
+        g.fillOval(size * j, size * i, size, size);
+        g.drawOval(size * j, size * i, size, size);
     }
+
 
     @Override
     protected void paintComponent(Graphics g) {
