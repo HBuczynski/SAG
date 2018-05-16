@@ -2,6 +2,9 @@ import java.awt.*;
 
 public class AntPositionInformCommand extends Command
 {
+
+    public static final int ILLEGAL_POSITION = Integer.MAX_VALUE;
+
     private Point newPosition;
     private Point oldPosition;
     private int distance;
@@ -11,10 +14,10 @@ public class AntPositionInformCommand extends Command
         super(CommandCode.ANT_POSITION_INFORM);
         newPosition = new Point();
         oldPosition = new Point();
-        this.newPosition.x = 9999999;
-        this.newPosition.y = 9999999;
-        this.oldPosition.x = 9999999;
-        this.oldPosition.y = 9999999;
+        this.newPosition.x = ILLEGAL_POSITION;
+        this.newPosition.y = ILLEGAL_POSITION;
+        this.oldPosition.x = ILLEGAL_POSITION;
+        this.oldPosition.y = ILLEGAL_POSITION;
 
         this.distance = 1;
     }

@@ -135,6 +135,10 @@ public class AntAgent extends Agent {
                             AntNeighbourhoodInformCommand neighbourhoodInformCommand = (AntNeighbourhoodInformCommand) cmd;
                             Vector<MazeField> maze = neighbourhoodInformCommand.getMazeValues();
                             boolean isExit = setNextMove(maze);
+                            if (isExit) {
+                                doDelete();
+                                return;
+                            }
                             Point newPosition = new Point();
                             newPosition.x = getCoordinateX();
                             newPosition.y = getCoordinateY();
@@ -151,9 +155,6 @@ public class AntAgent extends Agent {
                             }
                             System.out.println(Command.CommandCode.ANT_POSITION_INFORM.toString());
                             send(message);
-                            if (isExit) {
-                                return;
-                            }
                             break;
                     }
                 } catch (Exception ex) {

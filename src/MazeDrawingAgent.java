@@ -110,35 +110,6 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
                 }
             }
         });
-
- /*       addBehaviour(new CyclicBehaviour() {
-            @Override
-            public void action() {
-                receivedMessage = receive(MessageTemplateFactory.createInformTemplate());
-
-                if (receivedMessage != null) {
-
-                    try{
-                        Command cmd = (Command)receivedMessage.getContentObject();
-
-                        switch (cmd.getCommandCode())
-                        {
-                            case MAZE_INFORM:
-                                MazeInformCommand mazeGeneratorCmd = (MazeInformCommand) receivedMessage.getContentObject();
-                                maze = mazeGeneratorCmd.getMazeValues();
-                                drawer.redrawMaze(maze);
-                                System.out.println(Command.CommandCode.MAZE_INFORM.toString());
-                        }
-                    }
-                    catch (Exception ex) {
-                       ex.printStackTrace();
-                    }
-
-                } else {
-                   block();
-               }
-            }
-        });*/
     }
 
     protected void takeDown() {
