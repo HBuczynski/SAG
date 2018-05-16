@@ -16,6 +16,7 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
     private ContentDrawer drawer;
     private DFAgentDescription mazeManagerTemplate;
     private int exitAntCounter;
+    private int otherAnts;
 
 
     public void setup() {
@@ -125,6 +126,7 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
                     switch (command) {
                         case "MAZE_CHANGED_ANT_EXIT": {
                             exitAntCounter++;
+                            otherAnts--;
                             break;
                         }
 
@@ -148,6 +150,7 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
         ant.setName("single_ant");//AID
         template.addServices(ant);
 
+        otherAnts = count;
 
         try {
             antsResult = DFService.search(this, template);
