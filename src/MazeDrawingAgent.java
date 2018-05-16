@@ -27,6 +27,9 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
         drawer.setEvaporationCoeffListener(this);
         drawer.setMazeSizeListener(this);
 
+        exitAntCounter = 0;
+        otherAnts = 0;
+
         mazeManagerTemplate = new DFAgentDescription();
         ServiceDescription sd = new ServiceDescription();
         sd.setType("maze");
@@ -151,6 +154,7 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
         template.addServices(ant);
 
         otherAnts = count;
+        exitAntCounter = 0;
 
         try {
             antsResult = DFService.search(this, template);
