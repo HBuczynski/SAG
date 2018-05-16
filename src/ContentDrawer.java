@@ -104,10 +104,8 @@ public class ContentDrawer {
                  button1.addActionListener(e -> {
                      String stringValue = textField1.getText().trim();
                      if(!stringValue.isEmpty()){
-                         if(ants != Integer.parseInt(stringValue)){
                              ants = Integer.parseInt(stringValue);
                              antCountListener.onAntCountChanged(ants);
-                         }
 
                      }
                  });

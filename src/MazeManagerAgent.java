@@ -111,17 +111,28 @@ public class MazeManagerAgent extends Agent {
 
                                 //Sending information about four neighbouring fields: northern, eastern, southern, western
                                 //(in that order):
-                                Vector<MazeField> neighbourhood = new Vector<>(4);
+                                Vector<MazeField> neighbourhood = new Vector<MazeField>(0);
                                 for (int i = -1; i < 2; i += 2) {
                                     if (antPosition.x + i > 0 && antPosition.x + i < maze.length)
                                         if (maze[antPosition.x + i][antPosition.y].getValue() != MazeField.FieldCode.WALL &&
-                                                maze[antPosition.x + i][antPosition.y].getValue() != MazeField.FieldCode.MOBILE_WALL)
+                                                maze[antPosition.x + i][antPosition.y].getValue() != MazeField.FieldCode.MOBILE_WALL) {
                                             neighbourhood.add(maze[antPosition.x + i][antPosition.y]);
+                                            if(maze[antPosition.x + i][antPosition.y].getCoordinateX() == 0 || maze[antPosition.x + i][antPosition.y].getCoordinateY() == 0){
+                                                System.out.println("ERROR!");
+                                                return;
+                                            }
+                                        }
 
                                     if (antPosition.y + i > 0 && antPosition.y + i < maze.length)
                                         if (maze[antPosition.x][antPosition.y + i].getValue() != MazeField.FieldCode.WALL &&
-                                                maze[antPosition.x][antPosition.y + i].getValue() != MazeField.FieldCode.MOBILE_WALL)
+                                                maze[antPosition.x][antPosition.y + i].getValue() != MazeField.FieldCode.MOBILE_WALL) {
                                             neighbourhood.add(maze[antPosition.x][antPosition.y + i]);
+                                            if (maze[antPosition.x][antPosition.y + i].getCoordinateX() == 0 || maze[antPosition.x][antPosition.y + i].getCoordinateY() == 0) {
+                                                System.out.println("ERROR!");
+                                                return;
+                                            }
+                                        }
+
                                 }
                                 neighbourhoodInformCommand.setMazeValues(neighbourhood);
                                 try {
@@ -334,7 +345,7 @@ public class MazeManagerAgent extends Agent {
             c = rand.nextInt(size);
         }
         // Starting cell
-        maze[r][c] = new MazeField(MazeField.FieldCode.ALLEY);
+        maze[r][c].setValue(MazeField.FieldCode.ALLEY);
 
         //　Allocate the maze with recursive method
         recursion(r, c);
