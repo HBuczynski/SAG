@@ -71,6 +71,9 @@ public class ContentDrawer {
        // customOptionsPanel.setLayout(new BoxLayout(customOptionsPanel,BoxLayout.Y_AXIS));
         customOptionsPanel.setBackground(backgroundColor);
 
+        JLabel emptyLabel = new JLabel(" ");
+        emptyLabel.setMaximumSize(new Dimension(MAZE_PANE_DIM/4,30));
+
         Box verticalBox = Box.createVerticalBox();
 
         Box horizontalBox = Box.createHorizontalBox();
@@ -91,12 +94,29 @@ public class ContentDrawer {
         horizontalBox.add(drawHorizontalPanel(1));
         verticalBox.add(horizontalBox);
 
+        //empty line
+        horizontalBox = Box.createHorizontalBox();
+        horizontalBox.add(emptyLabel);
+        verticalBox.add(horizontalBox);
+
+        horizontalBox = Box.createHorizontalBox();
+        JLabel label3 = new JLabel("Współczynnik wyparowania (0<wsp<1)");
+        horizontalBox.add(label3);
+        JLabel emptyLabel2 = new JLabel(" ");
+        emptyLabel2.setMaximumSize(new Dimension(MAZE_PANE_DIM/3,30));
+        horizontalBox.add(emptyLabel2);
         //wpolczynnik wyparowania
-        verticalBox.add(new JLabel("Współczynnik wyparowania (0<wsp<1)"));
+        verticalBox.add(horizontalBox);
         verticalBox.add(drawHorizontalPanel(2));
 
         //zmiana rozmiaru lab
-        verticalBox.add(new JLabel("Zmiana rozmiaru labiryntu"));
+        horizontalBox = Box.createHorizontalBox();
+        JLabel label4 = new JLabel("Zmiana rozmiaru labiryntu");
+        horizontalBox.add(label4);
+        horizontalBox.add(emptyLabel);
+        horizontalBox.add(emptyLabel);
+
+        verticalBox.add(horizontalBox);
         verticalBox.add(drawMazeSizeButtonsPanel());
 
         //Mrowki pozostale
@@ -170,11 +190,8 @@ public class ContentDrawer {
                     }
                 });
 
-                JLabel emptyLabel = new JLabel(" ");
-                emptyLabel.setMaximumSize(new Dimension(90,1));
-                textField3.setMaximumSize(new Dimension(100,30));
+                textField3.setMaximumSize(new Dimension(80,30));
                 button3.setPreferredSize(new Dimension(80,30));
-                horizontalPanel.add(emptyLabel);
                 horizontalPanel.add(textField3);
                 horizontalPanel.add(button3);
                 break;
