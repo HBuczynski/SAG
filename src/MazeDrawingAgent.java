@@ -1,4 +1,3 @@
-import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
@@ -7,7 +6,6 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
-import jade.lang.acl.UnreadableException;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 
@@ -25,6 +23,7 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
     private JLabel countedAndOut;
     private JLabel countedAndExists;
 
+    private OnExitAntCounterChanged onExitAntCounterListener;
 
     public void setup() {
         drawer = new ContentDrawer();
@@ -33,6 +32,7 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
         drawer.setWallsCountListener(this);
         drawer.setEvaporationCoeffListener(this);
         drawer.setMazeSizeListener(this);
+        drawer.setDrawingAgent(this);
 
 
         exitAntCounter = 0;
@@ -176,6 +176,8 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
                         case "MAZE_CHANGED_ANT_EXIT": {
                             exitAntCounter++;
                             otherAnts--;
+
+                           onExitAntCounterListener.onExitAntValueChanged(exitAntCounter,otherAnts);
                             break;
                         }
 
@@ -196,6 +198,7 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
                         case "MAZE_CHANGED_ANT_EXIT": {
                             exitAntCounter++;
                             otherAnts--;
+                          onExitAntCounterListener.onExitAntValueChanged(exitAntCounter,otherAnts);
                             break;
                         }
 
@@ -219,8 +222,8 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
         ant.setName("single_ant");//AID
         template.addServices(ant);
 
-        otherAnts = count;
-        exitAntCounter = 0;
+       // otherAnts = count;
+       // exitAntCounter = 0;
 
         try {
             antsResult = DFService.search(this, template);
@@ -230,11 +233,11 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
 
             if (antsResult.length > count) {
                 //unregister ants
-                otherAnts = count;
-                countedAndExists.setText("W labiryncie jest " + otherAnts + " mrówek.");
-
-                exitAntCounter = antsResult.length - count;
-                countedAndOut.setText("Usunięto " + exitAntCounter + " mrówek.");
+//                otherAnts = count;
+//                countedAndExists.setText("W labiryncie jest " + otherAnts + " mrówek.");
+//
+//                exitAntCounter = antsResult.length - count;
+//                countedAndOut.setText("Usunięto " + exitAntCounter + " mrówek.");
 
                 int antsToUnregister = antsResult.length - count;
                 for (int j = 0; j < antsToUnregister; j++) {
@@ -247,10 +250,10 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
 
             if (antsResult.length < count) {
                 //register new ants
-                otherAnts = count;
-                countedAndExists.setText("W labiryncie jest " + otherAnts + " mrówek.");
-                exitAntCounter = count-antsResult.length;
-                countedAndOut.setText("Dodano " + exitAntCounter + " mrówek.");
+//                otherAnts = count;
+//                countedAndExists.setText("W labiryncie jest " + otherAnts + " mrówek.");
+//                exitAntCounter = count-antsResult.length;
+//                countedAndOut.setText("Dodano " + exitAntCounter + " mrówek.");
 
                 int antsToRegister = count - antsResult.length;
                 for (int j = 0; j < antsToRegister; j++) {
@@ -344,5 +347,13 @@ public class MazeDrawingAgent extends Agent implements SetAntCountListener, SetW
             MazeField.EVAPORATION_COEFF = coeff;
         }
         System.out.println(MazeField.EVAPORATION_COEFF);
+    }
+
+    public OnExitAntCounterChanged getOnExitAntCounterListener() {
+        return onExitAntCounterListener;
+    }
+
+    public void setOnExitAntCounterListener(OnExitAntCounterChanged onExitAntCounterListener) {
+        this.onExitAntCounterListener = onExitAntCounterListener;
     }
 }

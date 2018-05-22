@@ -1,7 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 
-public class ContentDrawer {
+public class ContentDrawer{
 
     private static final int CONTENT_PANE_WIDTH = 515; // 495+20
     private static final int CONTENT_PANE_HEIGHT = 745;// 10+495+200+10  <10+180+10>
@@ -17,11 +17,25 @@ public class ContentDrawer {
     private SetAntCountListener antCountListener;
     private SetWallsCountListener wallsCountListener;
     private SetEvaporationCoeffListener evaporationCoeffListener;
+    private OnExitAntCounterChanged onExitAntCounterChanged = (counter, other) -> {
+        setCountedAndExists(other);
+        setCountedAndOut(counter);
+    };
+
     private int walls;
     private int ants;
     private double coeff;
     private JLabel countedAndExists, countedAndOut;
 
+    private int exitAntCounter = 0;
+    private int otherAnts = 0;
+
+    private MazeDrawingAgent drawingAgent;
+
+    public void setDrawingAgent(MazeDrawingAgent drawingAgent) {
+        this.drawingAgent = drawingAgent;
+        this.drawingAgent.setOnExitAntCounterListener(onExitAntCounterChanged);
+    }
 
     public ContentDrawer(){
         walls = 0;
@@ -120,9 +134,11 @@ public class ContentDrawer {
         verticalBox.add(drawMazeSizeButtonsPanel());
 
         //Mrowki pozostale
+        setCountedAndExists(otherAnts);
         verticalBox.add(countedAndExists);
 
         //Mrowki opuszajace labirynt
+        setCountedAndOut(exitAntCounter);
         verticalBox.add(countedAndOut);
 
         customOptionsPanel.setBackground(backgroundColor);
@@ -260,4 +276,13 @@ public class ContentDrawer {
     public void setEvaporationCoeffListener(SetEvaporationCoeffListener evaporationCoeffListener) {
         this.evaporationCoeffListener = evaporationCoeffListener;
     }
+
+    private void setCountedAndExists(int value){
+        countedAndExists.setText("Mrówki pozostające w labiryncie: " + value);
+    }
+    private void setCountedAndOut(int value){
+        countedAndOut.setText("Mrówki usunięte z labiryntu: " + exitAntCounter);
+    }
+
+
 }
