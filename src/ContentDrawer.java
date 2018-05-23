@@ -4,7 +4,7 @@ import java.awt.*;
 public class ContentDrawer{
 
     private static final int CONTENT_PANE_WIDTH = 515; // 495+20
-    private static final int CONTENT_PANE_HEIGHT = 745;// 10+495+200+10  <10+180+10>
+    private static final int CONTENT_PANE_HEIGHT = 775;// 10+495+230+10  <10+180+10>
 
     private static final int MAZE_PANE_DIM = 495;
 
@@ -18,17 +18,21 @@ public class ContentDrawer{
     private SetWallsCountListener wallsCountListener;
     private SetEvaporationCoeffListener evaporationCoeffListener;
     private OnExitAntCounterChanged onExitAntCounterChanged = (counter, other) -> {
-        setCountedAndExists(other);
-        setCountedAndOut(counter);
+        setCountedAndExistsAnts(other);
+        setCountedAndOutAnts(counter);
     };
 
     private int walls;
     private int ants;
     private double coeff;
-    private JLabel countedAndExists, countedAndOut;
+    private JLabel countedAndExistsAnts, countedAndOutAnts;
+    private JLabel countedAndExistsWalls, countedAndOutWalls;
 
     private int exitAntCounter = 0;
     private int otherAnts = 0;
+
+    private int exitWallCounter = 0;
+    private int otherWalls = 0;
 
     private MazeDrawingAgent drawingAgent;
 
@@ -41,8 +45,11 @@ public class ContentDrawer{
         walls = 0;
         ants = 0;
         coeff = 0.9;
-        countedAndExists = new JLabel(" ");
-        countedAndOut = new JLabel(" ");
+        countedAndExistsAnts = new JLabel(" ");
+        countedAndOutAnts = new JLabel(" ");
+
+        countedAndExistsWalls = new JLabel(" ");
+        countedAndOutWalls = new JLabel(" ");
     }
 
     public void drawContent(){
@@ -119,6 +126,7 @@ public class ContentDrawer{
         JLabel emptyLabel2 = new JLabel(" ");
         emptyLabel2.setMaximumSize(new Dimension(MAZE_PANE_DIM/3,30));
         horizontalBox.add(emptyLabel2);
+
         //wpolczynnik wyparowania
         verticalBox.add(horizontalBox);
         verticalBox.add(drawHorizontalPanel(2));
@@ -133,13 +141,32 @@ public class ContentDrawer{
         verticalBox.add(horizontalBox);
         verticalBox.add(drawMazeSizeButtonsPanel());
 
+        Box verticalLabels = Box.createVerticalBox();
         //Mrowki pozostale
-        setCountedAndExists(otherAnts);
-        verticalBox.add(countedAndExists);
+        setCountedAndExistsAnts(otherAnts);
+        verticalLabels.add(countedAndExistsAnts);
 
         //Mrowki opuszajace labirynt
-        setCountedAndOut(exitAntCounter);
-        verticalBox.add(countedAndOut);
+        setCountedAndOutAnts(exitAntCounter);
+        verticalLabels.add(countedAndOutAnts);
+
+        //Scianki pozostale
+        setCountedAndExistsWalls(otherWalls);
+        verticalLabels.add(countedAndExistsWalls);
+
+        //Scianki opuszajace labirynt
+        setCountedAndOutWalls(exitWallCounter);
+        verticalLabels.add(countedAndOutWalls);
+
+        JLabel empty1 = new JLabel(" ");
+        empty1.setMaximumSize(new Dimension(400,30));
+        Box horizontalForLabels = Box.createHorizontalBox();
+
+        horizontalForLabels.add(empty1);
+        horizontalForLabels.add(verticalLabels);
+        horizontalForLabels.add(empty1);
+
+        verticalBox.add(horizontalForLabels);
 
         customOptionsPanel.setBackground(backgroundColor);
         customOptionsPanel.add(verticalBox);
@@ -160,7 +187,7 @@ public class ContentDrawer{
                      String stringValue = textField1.getText().trim();
                      if(!stringValue.isEmpty()){
                              ants = Integer.parseInt(stringValue);
-                             antCountListener.onAntCountChanged(ants,countedAndOut,countedAndExists);
+                             antCountListener.onAntCountChanged(ants,countedAndOutAnts,countedAndExistsAnts);
 
                      }
                      textField1.setText("");
@@ -180,7 +207,7 @@ public class ContentDrawer{
                     if(!stringValue.isEmpty()){
                         if(walls != Integer.parseInt(stringValue)){
                             walls = Integer.parseInt(stringValue);
-                            wallsCountListener.onWallsCountChanged(walls,countedAndOut,countedAndExists);
+                            wallsCountListener.onWallsCountChanged(walls,countedAndOutWalls,countedAndExistsWalls);
                         }
                         textField2.setText("");
                     }
@@ -277,11 +304,18 @@ public class ContentDrawer{
         this.evaporationCoeffListener = evaporationCoeffListener;
     }
 
-    private void setCountedAndExists(int value){
-        countedAndExists.setText("Mrówki pozostające w labiryncie: " + value);
+    private void setCountedAndExistsAnts(int value){
+        countedAndExistsAnts.setText("Mrówki pozostające w labiryncie: " + value);
     }
-    private void setCountedAndOut(int value){
-        countedAndOut.setText("Mrówki usunięte z labiryntu: " + exitAntCounter);
+    private void setCountedAndOutAnts(int value){
+        countedAndOutAnts.setText("Mrówki usunięte z labiryntu: " + exitAntCounter);
+    }
+
+    private void setCountedAndExistsWalls(int value){
+        countedAndExistsWalls.setText("Ścianki pozostające w labiryncie: " + value);
+    }
+    private void setCountedAndOutWalls(int value){
+        countedAndOutWalls.setText("Ścianki usunięte z labiryntu: " + exitAntCounter);
     }
 
 
